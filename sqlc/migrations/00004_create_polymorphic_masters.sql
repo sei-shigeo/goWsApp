@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS m_phones (
     owner_type VARCHAR(30) NOT NULL CHECK (owner_type IN ('company', 'customer', 'employee', 'company_office')),
     owner_id INTEGER NOT NULL,
     phone_number VARCHAR(20) NOT NULL,
-    phone_type SMALLINT NOT NULL DEFAULT 1,
+    phone_type VARCHAR(20) NOT NULL CHECK (phone_type IN ('固定電話', '携帯電話', '内線')),
     is_primary BOOLEAN DEFAULT false,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -90,9 +90,9 @@ CREATE INDEX idx_phones_owner ON m_phones(owner_type, owner_id);
 CREATE UNIQUE INDEX idx_phones_primary ON m_phones(owner_type, owner_id) WHERE is_primary = true;
 
 INSERT INTO m_phones (owner_type, owner_id, phone_number, phone_type, is_primary) VALUES 
-    ('company', 1, '052-123-4567', 1, true),
-    ('customer', 1, '03-1234-5678', 1, true),
-    ('employee', 1, '090-1111-2222', 2, true);
+    ('company', 1, '052-123-4567', '固定電話', true),
+    ('customer', 1, '03-1234-5678', '固定電話', true),
+    ('employee', 1, '090-1111-2222', '携帯電話', true);
 
 -- +goose StatementEnd
 

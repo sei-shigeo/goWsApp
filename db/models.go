@@ -374,7 +374,7 @@ type MPhone struct {
 	OwnerType   string             `json:"owner_type"`
 	OwnerID     int32              `json:"owner_id"`
 	PhoneNumber string             `json:"phone_number"`
-	PhoneType   int16              `json:"phone_type"`
+	PhoneType   string             `json:"phone_type"`
 	IsPrimary   *bool              `json:"is_primary"`
 	CreatedAt   pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`

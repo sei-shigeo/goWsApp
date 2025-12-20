@@ -23,8 +23,6 @@ type Querier interface {
 	CountDailyInspections(ctx context.Context, arg CountDailyInspectionsParams) (int64, error)
 	// オーダー数をカウント
 	CountDeliveryOrders(ctx context.Context, dollar_1 string) (int64, error)
-	// 従業員数をカウント
-	CountEmployees(ctx context.Context, dollar_1 bool) (int64, error)
 	// 請求書数をカウント
 	CountInvoices(ctx context.Context, dollar_1 string) (int64, error)
 	// サービス品名数をカウント
@@ -66,11 +64,6 @@ type Querier interface {
 	// 配送オーダーを新規登録
 	CreateDeliveryOrder(ctx context.Context, arg CreateDeliveryOrderParams) (DeliveryOrder, error)
 	// ==============================
-	// 従業員管理クエリ
-	// ==============================
-	// 従業員を新規登録
-	CreateEmployee(ctx context.Context, arg CreateEmployeeParams) (Employee, error)
-	// ==============================
 	// 請求書管理クエリ
 	// ==============================
 	// 請求書を作成
@@ -105,8 +98,6 @@ type Querier interface {
 	DeleteDeliveryDetail(ctx context.Context, id int32) error
 	// オーダーを論理削除
 	DeleteDeliveryOrder(ctx context.Context, id int32) error
-	// 従業員を論理削除
-	DeleteEmployee(ctx context.Context, id int32) error
 	// 特定従業員のすべてのセッションを削除
 	DeleteEmployeeSessions(ctx context.Context, employeeID int32) error
 	// 期限切れセッションを削除
@@ -146,10 +137,7 @@ type Querier interface {
 	GetDeliveryOrder(ctx context.Context, id int32) (GetDeliveryOrderRow, error)
 	// オーダー番号で取得
 	GetDeliveryOrderByNumber(ctx context.Context, orderNumber string) (GetDeliveryOrderByNumberRow, error)
-	// 従業員をIDで取得
-	GetEmployee(ctx context.Context, id int32) (GetEmployeeRow, error)
-	// 従業員コードで取得
-	GetEmployeeByCode(ctx context.Context, employeeCode *string) (GetEmployeeByCodeRow, error)
+	GetEmployeeCardList(ctx context.Context, arg GetEmployeeCardListParams) ([]GetEmployeeCardListRow, error)
 	// ==============================
 	// 認証・セッション管理クエリ
 	// ==============================
@@ -165,8 +153,6 @@ type Querier interface {
 	GetInvoiceSummaryByMonth(ctx context.Context, arg GetInvoiceSummaryByMonthParams) ([]GetInvoiceSummaryByMonthRow, error)
 	// 車両の最新点検記録を取得
 	GetLatestInspectionByVehicle(ctx context.Context, vehicleID int32) (GetLatestInspectionByVehicleRow, error)
-	// 免許証の有効期限が近い従業員を取得
-	GetLicenseExpiringSoon(ctx context.Context, dollar_1 pgtype.Interval) ([]GetLicenseExpiringSoonRow, error)
 	// ログイン履歴を取得
 	GetLoginLogs(ctx context.Context, arg GetLoginLogsParams) ([]LoginLog, error)
 	// オーダーが含まれる請求書を取得
@@ -213,8 +199,6 @@ type Querier interface {
 	ListActiveCompanyOffices(ctx context.Context) ([]ListActiveCompanyOfficesRow, error)
 	// アクティブな取引先一覧
 	ListActiveCustomers(ctx context.Context) ([]Customer, error)
-	// アクティブな従業員一覧
-	ListActiveEmployees(ctx context.Context) ([]ListActiveEmployeesRow, error)
 	// アクティブな車両一覧（配車可能）
 	ListActiveVehicles(ctx context.Context) ([]ListActiveVehiclesRow, error)
 	// 事業所一覧
@@ -241,12 +225,6 @@ type Querier interface {
 	ListDeliveryOrdersByCustomer(ctx context.Context, arg ListDeliveryOrdersByCustomerParams) ([]ListDeliveryOrdersByCustomerRow, error)
 	// 日付別オーダー一覧
 	ListDeliveryOrdersByDate(ctx context.Context, operationDate pgtype.Date) ([]ListDeliveryOrdersByDateRow, error)
-	// 運転者一覧を取得（配車用）
-	ListDrivers(ctx context.Context) ([]ListDriversRow, error)
-	// 従業員一覧を取得
-	ListEmployees(ctx context.Context, arg ListEmployeesParams) ([]ListEmployeesRow, error)
-	// 事業所別の従業員一覧
-	ListEmployeesByOffice(ctx context.Context, officeID *int32) ([]ListEmployeesByOfficeRow, error)
 	// 請求書一覧
 	ListInvoices(ctx context.Context, arg ListInvoicesParams) ([]ListInvoicesRow, error)
 	// 取引先別の請求書一覧
@@ -284,16 +262,12 @@ type Querier interface {
 	SearchCustomers(ctx context.Context, arg SearchCustomersParams) ([]Customer, error)
 	// オーダーを検索
 	SearchDeliveryOrders(ctx context.Context, arg SearchDeliveryOrdersParams) ([]SearchDeliveryOrdersRow, error)
-	// 従業員を検索
-	SearchEmployees(ctx context.Context, arg SearchEmployeesParams) ([]SearchEmployeesRow, error)
 	// 請求書を検索
 	SearchInvoices(ctx context.Context, arg SearchInvoicesParams) ([]SearchInvoicesRow, error)
 	// サービス品名を検索
 	SearchServiceItems(ctx context.Context, arg SearchServiceItemsParams) ([]ServiceItem, error)
 	// 車両を検索
 	SearchVehicles(ctx context.Context, arg SearchVehiclesParams) ([]SearchVehiclesRow, error)
-	// 従業員を退職処理
-	SetEmployeeRetirement(ctx context.Context, arg SetEmployeeRetirementParams) error
 	// メイン担当者を設定（他の担当者のis_primaryをfalseにする）
 	SetPrimaryContact(ctx context.Context, arg SetPrimaryContactParams) error
 	// 売上計上日を設定
@@ -320,10 +294,6 @@ type Querier interface {
 	UpdateDeliveryOrder(ctx context.Context, arg UpdateDeliveryOrderParams) error
 	// オーダーステータスを更新
 	UpdateDeliveryOrderStatus(ctx context.Context, arg UpdateDeliveryOrderStatusParams) error
-	// 従業員情報を更新
-	UpdateEmployee(ctx context.Context, arg UpdateEmployeeParams) error
-	// 運転免許情報を更新
-	UpdateEmployeeLicense(ctx context.Context, arg UpdateEmployeeLicenseParams) error
 	// パスワードを更新
 	UpdateEmployeePassword(ctx context.Context, arg UpdateEmployeePasswordParams) error
 	// 請求書を更新

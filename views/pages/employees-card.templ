@@ -1,9 +1,11 @@
 package pages
 
-import "fmt"
-import "github.com/sei-shigeo/webApp/dummyData"
+import (
+	"fmt"
+	"github.com/sei-shigeo/webApp/db"
+)
 
-templ EmployeesCard(employees []dummydata.EmployeeData) {
+templ EmployeesCard(employees []db.GetEmployeeCardListRow) {
 	<div class="card-container">
 		if len(employees) > 0 {
 			for _, employee := range employees {
@@ -21,48 +23,13 @@ templ EmployeesCard(employees []dummydata.EmployeeData) {
 			grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
 			gap: var(--spacing-sm);
 		}
-	</style>
-}
-
-templ EmployeeCard(employee dummydata.EmployeeData) {
-	<div class="card">
-		<img
-			class="image"
-			src={ employee.ImageURL }
-			alt={ fmt.Sprintf("Employee %d: %s", employee.ID, employee.Name) }
-		/>
-		<ul class="content-list">
-			<li class="item">
-				<span class="material-symbols-outlined">person</span>
-				<span>{ employee.Name }</span>
-			</li>
-			<li class="item">
-				<span class="material-symbols-outlined">email</span>
-				<span>{ employee.Email }</span>
-			</li>
-			<li class="item">
-				<span class="material-symbols-outlined">phone</span>
-				<span>{ employee.Phone }</span>
-			</li>
-			<li class="item">
-				<span class="material-symbols-outlined">location_on</span>
-				<span>{ employee.Location }</span>
-			</li>
-		</ul>
-		<a class="print-button" href={ fmt.Sprintf("/employees/print/%d", employee.ID) } target="_blank">
-			<span class="material-symbols-outlined">print</span>
-		</a>
-	</div>
-	<style>
 		.card {
 			display: grid;
 			grid-template-columns: var(--card-image-size) 1fr auto;
 			grid-template-rows: var(--card-image-size);
-      align-items: center;
-			gap: var(--spacing-sm);
+			align-items: center;
 			border: 1px solid var(--sidebar-item-hover);
 			border-radius: var(--border-radius-xs);
-			padding: var(--spacing-sm);
 			background-color: var(--white);
 			transition: box-shadow 0.2s ease;
 
@@ -74,13 +41,14 @@ templ EmployeeCard(employee dummydata.EmployeeData) {
 				width: var(--card-image-size);
 				height: var(--card-image-size);
 				object-fit: cover;
-				border-radius: var(--border-radius-xs);
+				border-top-left-radius: var(--border-radius-xs);
+				border-bottom-left-radius: var(--border-radius-xs);
 			}
 
 			& > .content-list {
 				display: flex;
 				flex-direction: column;
-				gap: var(--spacing-xs);
+				padding-inline: var(--spacing-md);
 				overflow: hidden;
 
 				& > .item {
@@ -125,4 +93,47 @@ templ EmployeeCard(employee dummydata.EmployeeData) {
 			}
 		}
 	</style>
+}
+
+templ EmployeeCard(employee db.GetEmployeeCardListRow) {
+	<div class="card">
+		<img
+			class="image"
+			src="https://placehold.jp/150x150.png"
+			alt={ fmt.Sprintf("Employee %d: %s", employee.ID, employee.LastName+" "+employee.FirstName) }
+		/>
+		<ul class="content-list">
+			<li class="item">
+				<span class="material-symbols-outlined">badge</span>
+				if employee.EmployeeCode != nil {
+					<span>{ *employee.EmployeeCode }</span>
+				} else {
+					<span>-</span>
+				}
+			</li>
+			<li class="item">
+				<span class="material-symbols-outlined">person</span>
+				<span>{ employee.LastName + " " + employee.FirstName }</span>
+			</li>
+			<li class="item">
+				<span class="material-symbols-outlined">phone</span>
+				if employee.PhoneNumber != nil {
+					<span>{ *employee.PhoneNumber }</span>
+				} else {
+					<span>-</span>
+				}
+			</li>
+			<li class="item">
+				<span class="material-symbols-outlined">email</span>
+				if employee.Email != nil {
+					<span>{ *employee.Email }</span>
+				} else {
+					<span>-</span>
+				}
+			</li>
+		</ul>
+		<a class="print-button" href={ fmt.Sprintf("/employees/print/%d", employee.ID) } target="_blank">
+			<span class="material-symbols-outlined">print</span>
+		</a>
+	</div>
 }

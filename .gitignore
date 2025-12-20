@@ -1,0 +1,24 @@
+# 環境変数ファイル（機密情報を含むため）
+.env
+
+# Go関連
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+tmp/
+bin/
+
+# IDE関連
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS関連
+.DS_Store
+Thumbs.db

@@ -1,0 +1,128 @@
+package pages
+
+import "fmt"
+import "github.com/sei-shigeo/webApp/dummyData"
+
+templ EmployeesCard(employees []dummydata.EmployeeData) {
+	<div class="card-container">
+		if len(employees) > 0 {
+			for _, employee := range employees {
+				@EmployeeCard(employee)
+			}
+		} else {
+			<div class="no-employees">
+				<span>No employees found</span>
+			</div>
+		}
+	</div>
+	<style>
+		.card-container {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+			gap: var(--spacing-sm);
+		}
+	</style>
+}
+
+templ EmployeeCard(employee dummydata.EmployeeData) {
+	<div class="card">
+		<img
+			class="image"
+			src={ employee.ImageURL }
+			alt={ fmt.Sprintf("Employee %d: %s", employee.ID, employee.Name) }
+		/>
+		<ul class="content-list">
+			<li class="item">
+				<span class="material-symbols-outlined">person</span>
+				<span>{ employee.Name }</span>
+			</li>
+			<li class="item">
+				<span class="material-symbols-outlined">email</span>
+				<span>{ employee.Email }</span>
+			</li>
+			<li class="item">
+				<span class="material-symbols-outlined">phone</span>
+				<span>{ employee.Phone }</span>
+			</li>
+			<li class="item">
+				<span class="material-symbols-outlined">location_on</span>
+				<span>{ employee.Location }</span>
+			</li>
+		</ul>
+		<a class="print-button" href={ fmt.Sprintf("/employees/print/%d", employee.ID) } target="_blank">
+			<span class="material-symbols-outlined">print</span>
+		</a>
+	</div>
+	<style>
+		.card {
+			display: grid;
+			grid-template-columns: var(--card-image-size) 1fr auto;
+			grid-template-rows: var(--card-image-size);
+      align-items: center;
+			gap: var(--spacing-sm);
+			border: 1px solid var(--sidebar-item-hover);
+			border-radius: var(--border-radius-xs);
+			padding: var(--spacing-sm);
+			background-color: var(--white);
+			transition: box-shadow 0.2s ease;
+
+			&:hover {
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+			}
+
+			& > .image {
+				width: var(--card-image-size);
+				height: var(--card-image-size);
+				object-fit: cover;
+				border-radius: var(--border-radius-xs);
+			}
+
+			& > .content-list {
+				display: flex;
+				flex-direction: column;
+				gap: var(--spacing-xs);
+				overflow: hidden;
+
+				& > .item {
+					display: flex;
+					align-items: center;
+					gap: var(--spacing-sm);
+					min-width: 0;
+
+					& > .material-symbols-outlined {
+						font-size: var(--icon-size-xs);
+						flex-shrink: 0;
+						color: var(--gray);
+					}
+
+					& > span:last-child {
+						font-size: var(--font-size-xs);
+						overflow: hidden;
+						text-overflow: ellipsis;
+						white-space: nowrap;
+					}
+				}
+			}
+
+			& > .print-button {
+				color: var(--black);
+				padding: var(--spacing-sm);
+				border-radius: var(--border-radius-xs);
+				transition: background-color 0.2s ease;
+
+				&:hover {
+					background-color: var(--sidebar-item-hover);
+				}
+
+				&:focus-visible {
+					outline: 2px solid var(--primary);
+					outline-offset: 2px;
+				}
+
+				& > .material-symbols-outlined {
+					font-size: var(--icon-size-md);
+				}
+			}
+		}
+	</style>
+}

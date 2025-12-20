@@ -1,0 +1,39 @@
+package components
+
+templ AccountContainer() {
+	<div class="login-account-container">
+		for i := range 3 {
+			<div class="login-account-icon">{ i + 1 }</div>
+		}
+	</div>
+	<style>
+		.login-account-container {
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+			& > .login-account-icon {
+				width: var(--size-2xl);
+				aspect-ratio: 1/1;
+				border-radius: var(--border-radius-circle);
+				background-color: var(--light-gray);
+				display: grid;
+				place-items: center;
+				font-size: var(--font-size-sm);
+				font-weight: var(--font-weight-5);
+				color: var(--black);
+				border: 2px solid var(--white); /* 重ねた時に見やすくするため */
+				
+				/* 重ねるスタイル */
+				&:not(:first-child) {
+					margin-left: calc(var(--size-2xl) * -0.3); /* 30%重ねる */
+				}
+				
+				/* 重ね順を制御（後ろのアイコンが前に） */
+				position: relative;
+				z-index: 1;
+				&:nth-child(2) { z-index: 2; }
+				&:nth-child(3) { z-index: 3; }
+			}
+		}
+	</style>
+}

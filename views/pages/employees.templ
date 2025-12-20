@@ -1,0 +1,23 @@
+package pages
+
+import (
+	"github.com/sei-shigeo/webApp/views/components"
+	"github.com/sei-shigeo/webApp/views/layouts"
+	"github.com/sei-shigeo/webApp/dummyData"
+)
+
+
+templ Employees() {
+	@layouts.Base() {
+		<div class="mainContentLayout">
+			<div class="header">
+				<h1>Employees</h1>
+				@components.Search()
+				@components.AccountContainer()
+			</div>
+			<div class="content">
+				@EmployeesCard(dummydata.Employees)
+			</div>
+		</div>
+	}
+}

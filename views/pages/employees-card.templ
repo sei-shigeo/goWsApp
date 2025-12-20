@@ -96,7 +96,7 @@ templ EmployeesCard(employees []db.GetEmployeeCardListRow) {
 }
 
 templ EmployeeCard(employee db.GetEmployeeCardListRow) {
-	<div class="card">
+	<div class="card" data-on:click={ fmt.Sprintf("@get('/employees/details/%d')", employee.ID) }>
 		<img
 			class="image"
 			src="https://placehold.jp/150x150.png"

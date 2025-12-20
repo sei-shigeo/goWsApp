@@ -7,7 +7,236 @@ package db
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
+
+const getEmployeeAccidentRecords = `-- name: GetEmployeeAccidentRecords :many
+SELECT id, employee_id, accident_date, accident_type, accident_location, notes, created_at, updated_at FROM accident_records WHERE employee_id = $1 AND deleted_at IS NULL
+`
+
+// 事故履歴
+func (q *Queries) GetEmployeeAccidentRecords(ctx context.Context, employeeID int32) ([]AccidentRecord, error) {
+	rows, err := q.db.Query(ctx, getEmployeeAccidentRecords, employeeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []AccidentRecord{}
+	for rows.Next() {
+		var i AccidentRecord
+		if err := rows.Scan(
+			&i.ID,
+			&i.EmployeeID,
+			&i.AccidentDate,
+			&i.AccidentType,
+			&i.AccidentLocation,
+			&i.Notes,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getEmployeeAddresses = `-- name: GetEmployeeAddresses :many
+SELECT id, owner_type, owner_id, postal_code, prefecture, city, street_address, building_name, is_primary, created_at, updated_at FROM m_addresses WHERE owner_id = $1 AND owner_type = 'employee' AND deleted_at IS NULL
+`
+
+// 住所
+func (q *Queries) GetEmployeeAddresses(ctx context.Context, ownerID int32) ([]MAddress, error) {
+	rows, err := q.db.Query(ctx, getEmployeeAddresses, ownerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []MAddress{}
+	for rows.Next() {
+		var i MAddress
+		if err := rows.Scan(
+			&i.ID,
+			&i.OwnerType,
+			&i.OwnerID,
+			&i.PostalCode,
+			&i.Prefecture,
+			&i.City,
+			&i.StreetAddress,
+			&i.BuildingName,
+			&i.IsPrimary,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getEmployeeBanks = `-- name: GetEmployeeBanks :many
+SELECT id, owner_type, owner_id, bank_code, bank_name, branch_code, branch_name, account_type, account_number, account_name, account_kana, is_active, created_at, updated_at FROM m_banks WHERE owner_id = $1 AND owner_type = 'employee' AND deleted_at IS NULL
+`
+
+// 銀行
+func (q *Queries) GetEmployeeBanks(ctx context.Context, ownerID int32) ([]MBank, error) {
+	rows, err := q.db.Query(ctx, getEmployeeBanks, ownerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []MBank{}
+	for rows.Next() {
+		var i MBank
+		if err := rows.Scan(
+			&i.ID,
+			&i.OwnerType,
+			&i.OwnerID,
+			&i.BankCode,
+			&i.BankName,
+			&i.BranchCode,
+			&i.BranchName,
+			&i.AccountType,
+			&i.AccountNumber,
+			&i.AccountName,
+			&i.AccountKana,
+			&i.IsActive,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getEmployeeBasicInfo = `-- name: GetEmployeeBasicInfo :one
+SELECT 
+e.id, e.employee_code, e.employee_image_url, e.employee_photo_date, e.last_name, e.first_name, e.last_name_kana, e.first_name_kana, e.legal_name, e.gender, e.birth_date, e.hire_date, e.appointment_date, e.office_id, e.job_type, e.employment_type, e.department, e.position, e.retirement_date, e.retirement_reason, e.death_date, e.death_reason, e.driver_license_no, e.driver_license_type, e.driver_license_issue_date, e.driver_license_expiry, e.driver_license_image_url_front, e.driver_license_image_url_back, e.driving_disabled_date, e.driving_disabled_reason, e.nationality, e.visa_type, e.visa_expiry, e.role_id, e.password_hash, e.password_updated_at, e.failed_login_attempts, e.locked_until, e.last_login_at, e.is_active, e.created_at, e.updated_at, e.deleted_at, 
+co.office_name, 
+co.office_type,
+r.name as role_name
+FROM employees e
+LEFT JOIN company_offices co ON e.office_id = co.id AND co.deleted_at IS NULL
+LEFT JOIN m_roles r ON e.role_id = r.id
+WHERE e.id = $1 AND e.deleted_at IS NULL
+`
+
+type GetEmployeeBasicInfoRow struct {
+	ID                         int32              `json:"id"`
+	EmployeeCode               *string            `json:"employee_code"`
+	EmployeeImageUrl           *string            `json:"employee_image_url"`
+	EmployeePhotoDate          pgtype.Date        `json:"employee_photo_date"`
+	LastName                   string             `json:"last_name"`
+	FirstName                  string             `json:"first_name"`
+	LastNameKana               *string            `json:"last_name_kana"`
+	FirstNameKana              *string            `json:"first_name_kana"`
+	LegalName                  *string            `json:"legal_name"`
+	Gender                     *string            `json:"gender"`
+	BirthDate                  pgtype.Date        `json:"birth_date"`
+	HireDate                   pgtype.Date        `json:"hire_date"`
+	AppointmentDate            pgtype.Date        `json:"appointment_date"`
+	OfficeID                   *int32             `json:"office_id"`
+	JobType                    *string            `json:"job_type"`
+	EmploymentType             *string            `json:"employment_type"`
+	Department                 *string            `json:"department"`
+	Position                   *string            `json:"position"`
+	RetirementDate             pgtype.Date        `json:"retirement_date"`
+	RetirementReason           *string            `json:"retirement_reason"`
+	DeathDate                  pgtype.Date        `json:"death_date"`
+	DeathReason                *string            `json:"death_reason"`
+	DriverLicenseNo            *string            `json:"driver_license_no"`
+	DriverLicenseType          *string            `json:"driver_license_type"`
+	DriverLicenseIssueDate     pgtype.Date        `json:"driver_license_issue_date"`
+	DriverLicenseExpiry        pgtype.Date        `json:"driver_license_expiry"`
+	DriverLicenseImageUrlFront *string            `json:"driver_license_image_url_front"`
+	DriverLicenseImageUrlBack  *string            `json:"driver_license_image_url_back"`
+	DrivingDisabledDate        pgtype.Date        `json:"driving_disabled_date"`
+	DrivingDisabledReason      *string            `json:"driving_disabled_reason"`
+	Nationality                *string            `json:"nationality"`
+	VisaType                   *string            `json:"visa_type"`
+	VisaExpiry                 pgtype.Date        `json:"visa_expiry"`
+	RoleID                     *int32             `json:"role_id"`
+	PasswordHash               *string            `json:"password_hash"`
+	PasswordUpdatedAt          pgtype.Timestamptz `json:"password_updated_at"`
+	FailedLoginAttempts        *int32             `json:"failed_login_attempts"`
+	LockedUntil                pgtype.Timestamptz `json:"locked_until"`
+	LastLoginAt                pgtype.Timestamptz `json:"last_login_at"`
+	IsActive                   *bool              `json:"is_active"`
+	CreatedAt                  pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt                  pgtype.Timestamptz `json:"updated_at"`
+	DeletedAt                  pgtype.Timestamptz `json:"deleted_at"`
+	OfficeName                 *string            `json:"office_name"`
+	OfficeType                 *string            `json:"office_type"`
+	RoleName                   *string            `json:"role_name"`
+}
+
+// 基本情報 + 所属事業所 + 制限情報
+func (q *Queries) GetEmployeeBasicInfo(ctx context.Context, id int32) (GetEmployeeBasicInfoRow, error) {
+	row := q.db.QueryRow(ctx, getEmployeeBasicInfo, id)
+	var i GetEmployeeBasicInfoRow
+	err := row.Scan(
+		&i.ID,
+		&i.EmployeeCode,
+		&i.EmployeeImageUrl,
+		&i.EmployeePhotoDate,
+		&i.LastName,
+		&i.FirstName,
+		&i.LastNameKana,
+		&i.FirstNameKana,
+		&i.LegalName,
+		&i.Gender,
+		&i.BirthDate,
+		&i.HireDate,
+		&i.AppointmentDate,
+		&i.OfficeID,
+		&i.JobType,
+		&i.EmploymentType,
+		&i.Department,
+		&i.Position,
+		&i.RetirementDate,
+		&i.RetirementReason,
+		&i.DeathDate,
+		&i.DeathReason,
+		&i.DriverLicenseNo,
+		&i.DriverLicenseType,
+		&i.DriverLicenseIssueDate,
+		&i.DriverLicenseExpiry,
+		&i.DriverLicenseImageUrlFront,
+		&i.DriverLicenseImageUrlBack,
+		&i.DrivingDisabledDate,
+		&i.DrivingDisabledReason,
+		&i.Nationality,
+		&i.VisaType,
+		&i.VisaExpiry,
+		&i.RoleID,
+		&i.PasswordHash,
+		&i.PasswordUpdatedAt,
+		&i.FailedLoginAttempts,
+		&i.LockedUntil,
+		&i.LastLoginAt,
+		&i.IsActive,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.OfficeName,
+		&i.OfficeType,
+		&i.RoleName,
+	)
+	return i, err
+}
 
 const getEmployeeCardList = `-- name: GetEmployeeCardList :many
 SELECT 
@@ -16,16 +245,11 @@ SELECT
     e.employee_image_url, 
     e.last_name, 
     e.first_name,
-    a.prefecture,
-    a.city,
-    a.street_address,
-    a.building_name,
     m.email,
     p.phone_number
 FROM employees e
 LEFT JOIN m_emails m ON e.id = m.owner_id AND m.owner_type = 'employee' AND m.is_primary = true
 LEFT JOIN m_phones p ON e.id = p.owner_id AND p.owner_type = 'employee' AND p.is_primary = true
-LEFT JOIN m_addresses a ON e.id = a.owner_id AND a.owner_type = 'employee' AND a.is_primary = true
 WHERE e.deleted_at IS NULL
 ORDER BY e.employee_code
 LIMIT $1 OFFSET $2
@@ -42,10 +266,6 @@ type GetEmployeeCardListRow struct {
 	EmployeeImageUrl *string `json:"employee_image_url"`
 	LastName         string  `json:"last_name"`
 	FirstName        string  `json:"first_name"`
-	Prefecture       *string `json:"prefecture"`
-	City             *string `json:"city"`
-	StreetAddress    *string `json:"street_address"`
-	BuildingName     *string `json:"building_name"`
 	Email            *string `json:"email"`
 	PhoneNumber      *string `json:"phone_number"`
 }
@@ -65,12 +285,314 @@ func (q *Queries) GetEmployeeCardList(ctx context.Context, arg GetEmployeeCardLi
 			&i.EmployeeImageUrl,
 			&i.LastName,
 			&i.FirstName,
-			&i.Prefecture,
-			&i.City,
-			&i.StreetAddress,
-			&i.BuildingName,
 			&i.Email,
 			&i.PhoneNumber,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getEmployeeCareerRecords = `-- name: GetEmployeeCareerRecords :many
+SELECT id, employee_id, career_type, career_date, career_institution, notes, created_at, updated_at FROM career_records WHERE employee_id = $1 AND deleted_at IS NULL
+`
+
+// 職歴
+func (q *Queries) GetEmployeeCareerRecords(ctx context.Context, employeeID int32) ([]CareerRecord, error) {
+	rows, err := q.db.Query(ctx, getEmployeeCareerRecords, employeeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []CareerRecord{}
+	for rows.Next() {
+		var i CareerRecord
+		if err := rows.Scan(
+			&i.ID,
+			&i.EmployeeID,
+			&i.CareerType,
+			&i.CareerDate,
+			&i.CareerInstitution,
+			&i.Notes,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getEmployeeEducationRecords = `-- name: GetEmployeeEducationRecords :many
+SELECT id, employee_id, education_type, education_date, education_institution, notes, created_at, updated_at FROM education_records WHERE employee_id = $1 AND deleted_at IS NULL
+`
+
+// 学歴
+func (q *Queries) GetEmployeeEducationRecords(ctx context.Context, employeeID int32) ([]EducationRecord, error) {
+	rows, err := q.db.Query(ctx, getEmployeeEducationRecords, employeeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []EducationRecord{}
+	for rows.Next() {
+		var i EducationRecord
+		if err := rows.Scan(
+			&i.ID,
+			&i.EmployeeID,
+			&i.EducationType,
+			&i.EducationDate,
+			&i.EducationInstitution,
+			&i.Notes,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getEmployeeEmails = `-- name: GetEmployeeEmails :many
+SELECT id, owner_type, owner_id, email, is_primary, created_at, updated_at FROM m_emails WHERE owner_id = $1 AND owner_type = 'employee' AND deleted_at IS NULL
+`
+
+// メールアドレス
+func (q *Queries) GetEmployeeEmails(ctx context.Context, ownerID int32) ([]MEmail, error) {
+	rows, err := q.db.Query(ctx, getEmployeeEmails, ownerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []MEmail{}
+	for rows.Next() {
+		var i MEmail
+		if err := rows.Scan(
+			&i.ID,
+			&i.OwnerType,
+			&i.OwnerID,
+			&i.Email,
+			&i.IsPrimary,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getEmployeeHealthCheckupRecords = `-- name: GetEmployeeHealthCheckupRecords :many
+SELECT id, employee_id, checkup_date, checkup_type, overall_result, medical_institution, notes, created_at, updated_at FROM health_checkup_records WHERE employee_id = $1 AND deleted_at IS NULL
+`
+
+// 健康診断
+func (q *Queries) GetEmployeeHealthCheckupRecords(ctx context.Context, employeeID int32) ([]HealthCheckupRecord, error) {
+	rows, err := q.db.Query(ctx, getEmployeeHealthCheckupRecords, employeeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []HealthCheckupRecord{}
+	for rows.Next() {
+		var i HealthCheckupRecord
+		if err := rows.Scan(
+			&i.ID,
+			&i.EmployeeID,
+			&i.CheckupDate,
+			&i.CheckupType,
+			&i.OverallResult,
+			&i.MedicalInstitution,
+			&i.Notes,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getEmployeeInsuranceRecords = `-- name: GetEmployeeInsuranceRecords :many
+SELECT id, employee_id, insurance_type, insurance_date, insurance_image_url, created_at, updated_at FROM insurance_records WHERE employee_id = $1 AND deleted_at IS NULL
+`
+
+// 保険
+func (q *Queries) GetEmployeeInsuranceRecords(ctx context.Context, employeeID int32) ([]InsuranceRecord, error) {
+	rows, err := q.db.Query(ctx, getEmployeeInsuranceRecords, employeeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []InsuranceRecord{}
+	for rows.Next() {
+		var i InsuranceRecord
+		if err := rows.Scan(
+			&i.ID,
+			&i.EmployeeID,
+			&i.InsuranceType,
+			&i.InsuranceDate,
+			&i.InsuranceImageUrl,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getEmployeePhones = `-- name: GetEmployeePhones :many
+SELECT id, owner_type, owner_id, phone_number, phone_type, is_primary, created_at, updated_at FROM m_phones WHERE owner_id = $1 AND owner_type = 'employee' AND deleted_at IS NULL
+`
+
+// 電話番号
+func (q *Queries) GetEmployeePhones(ctx context.Context, ownerID int32) ([]MPhone, error) {
+	rows, err := q.db.Query(ctx, getEmployeePhones, ownerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []MPhone{}
+	for rows.Next() {
+		var i MPhone
+		if err := rows.Scan(
+			&i.ID,
+			&i.OwnerType,
+			&i.OwnerID,
+			&i.PhoneNumber,
+			&i.PhoneType,
+			&i.IsPrimary,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getEmployeeQualificationRecords = `-- name: GetEmployeeQualificationRecords :many
+SELECT id, employee_id, qualification_type, qualification_date, qualification_number, qualification_image_url, created_at, updated_at FROM qualification_records WHERE employee_id = $1 AND deleted_at IS NULL
+`
+
+// 資格
+func (q *Queries) GetEmployeeQualificationRecords(ctx context.Context, employeeID int32) ([]QualificationRecord, error) {
+	rows, err := q.db.Query(ctx, getEmployeeQualificationRecords, employeeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []QualificationRecord{}
+	for rows.Next() {
+		var i QualificationRecord
+		if err := rows.Scan(
+			&i.ID,
+			&i.EmployeeID,
+			&i.QualificationType,
+			&i.QualificationDate,
+			&i.QualificationNumber,
+			&i.QualificationImageUrl,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getEmployeeTrainingRecords = `-- name: GetEmployeeTrainingRecords :many
+SELECT id, employee_id, training_type, training_date, training_hours, instructor, notes, created_at, updated_at FROM training_records WHERE employee_id = $1 AND deleted_at IS NULL
+`
+
+// 教育訓練
+func (q *Queries) GetEmployeeTrainingRecords(ctx context.Context, employeeID int32) ([]TrainingRecord, error) {
+	rows, err := q.db.Query(ctx, getEmployeeTrainingRecords, employeeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []TrainingRecord{}
+	for rows.Next() {
+		var i TrainingRecord
+		if err := rows.Scan(
+			&i.ID,
+			&i.EmployeeID,
+			&i.TrainingType,
+			&i.TrainingDate,
+			&i.TrainingHours,
+			&i.Instructor,
+			&i.Notes,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getEmployeeViolationRecords = `-- name: GetEmployeeViolationRecords :many
+SELECT id, employee_id, violation_date, violation_type, violation_location, notes, created_at, updated_at FROM violation_records WHERE employee_id = $1 AND deleted_at IS NULL
+`
+
+// 違反履歴
+func (q *Queries) GetEmployeeViolationRecords(ctx context.Context, employeeID int32) ([]ViolationRecord, error) {
+	rows, err := q.db.Query(ctx, getEmployeeViolationRecords, employeeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ViolationRecord{}
+	for rows.Next() {
+		var i ViolationRecord
+		if err := rows.Scan(
+			&i.ID,
+			&i.EmployeeID,
+			&i.ViolationDate,
+			&i.ViolationType,
+			&i.ViolationLocation,
+			&i.Notes,
+			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}

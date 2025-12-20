@@ -27,6 +27,24 @@ func EmployeesHandler(w http.ResponseWriter, r *http.Request) {
 	pages.Employees(employees).Render(r.Context(), w)
 }
 
+func EmployeesBasicInfoHandler(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
+		return
+	}
+
+	// 基本情報を取得
+	basicInfo, err := queries.GetEmployeeBasicInfo(r.Context(), int32(idInt))
+	if err != nil {
+		http.Error(w, "Failed to get employee basic info", http.StatusInternalServerError)
+		return
+	}
+
+	pages.EmployeesDetails(basicInfo).Render(r.Context(), w)
+}
+
 func EmployeesPrintHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	idInt, err := strconv.Atoi(id)

@@ -137,12 +137,38 @@ type Querier interface {
 	GetDeliveryOrder(ctx context.Context, id int32) (GetDeliveryOrderRow, error)
 	// オーダー番号で取得
 	GetDeliveryOrderByNumber(ctx context.Context, orderNumber string) (GetDeliveryOrderByNumberRow, error)
+	// 事故履歴
+	GetEmployeeAccidentRecords(ctx context.Context, employeeID int32) ([]AccidentRecord, error)
+	// 住所
+	GetEmployeeAddresses(ctx context.Context, ownerID int32) ([]MAddress, error)
+	// 銀行
+	GetEmployeeBanks(ctx context.Context, ownerID int32) ([]MBank, error)
+	// 基本情報 + 所属事業所 + 制限情報
+	GetEmployeeBasicInfo(ctx context.Context, id int32) (GetEmployeeBasicInfoRow, error)
 	GetEmployeeCardList(ctx context.Context, arg GetEmployeeCardListParams) ([]GetEmployeeCardListRow, error)
+	// 職歴
+	GetEmployeeCareerRecords(ctx context.Context, employeeID int32) ([]CareerRecord, error)
+	// 学歴
+	GetEmployeeEducationRecords(ctx context.Context, employeeID int32) ([]EducationRecord, error)
+	// メールアドレス
+	GetEmployeeEmails(ctx context.Context, ownerID int32) ([]MEmail, error)
 	// ==============================
 	// 認証・セッション管理クエリ
 	// ==============================
 	// 従業員コードでログイン情報を取得
 	GetEmployeeForLogin(ctx context.Context, employeeCode *string) (GetEmployeeForLoginRow, error)
+	// 健康診断
+	GetEmployeeHealthCheckupRecords(ctx context.Context, employeeID int32) ([]HealthCheckupRecord, error)
+	// 保険
+	GetEmployeeInsuranceRecords(ctx context.Context, employeeID int32) ([]InsuranceRecord, error)
+	// 電話番号
+	GetEmployeePhones(ctx context.Context, ownerID int32) ([]MPhone, error)
+	// 資格
+	GetEmployeeQualificationRecords(ctx context.Context, employeeID int32) ([]QualificationRecord, error)
+	// 教育訓練
+	GetEmployeeTrainingRecords(ctx context.Context, employeeID int32) ([]TrainingRecord, error)
+	// 違反履歴
+	GetEmployeeViolationRecords(ctx context.Context, employeeID int32) ([]ViolationRecord, error)
 	// 請求書を取得
 	GetInvoice(ctx context.Context, id int32) (GetInvoiceRow, error)
 	// 請求書番号で取得

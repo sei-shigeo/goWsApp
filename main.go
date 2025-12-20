@@ -69,6 +69,7 @@ func main() {
 	// 従業員ページを表示
 	mux.HandleFunc("GET /employees", handlers.EmployeesHandler)
 	mux.HandleFunc("GET /employees/print/{id}", handlers.EmployeesPrintHandler)
+	mux.HandleFunc("GET /employees/details/{id}", handlers.EmployeesBasicInfoHandler)
 
 	server := http.Server{
 		Addr:    ":8080",

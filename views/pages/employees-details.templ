@@ -1,0 +1,57 @@
+package pages
+
+import "github.com/sei-shigeo/webApp/db"
+import "github.com/sei-shigeo/webApp/views/layouts"
+import "github.com/sei-shigeo/webApp/helpers"
+
+templ EmployeesDetails(basicInfo db.GetEmployeeBasicInfoRow) {
+	@layouts.Base() {
+		<div class="detailsLayout">
+			<div class="header">
+				<h1>従業員詳細</h1>
+			</div>
+			<div class="content">
+				<ul>
+					<li>
+						<span>従業員コード</span>
+						<span>{ helpers.StringOf(basicInfo.EmployeeCode) }</span>
+					</li>
+					<li>
+						<span>名前</span>
+						<span>{ basicInfo.LastName } { basicInfo.FirstName }</span>
+					</li>
+					<li>
+						<span>所属事業所</span>
+						<span>{ helpers.StringOf(basicInfo.OfficeName) }</span>
+					</li>
+					<li>
+						<span>事業所種別</span>
+						<span>{ helpers.StringOf(basicInfo.OfficeType) }</span>
+					</li>
+					<li>
+						<span>権限</span>
+						<span>{ helpers.StringOf(basicInfo.RoleName) }</span>
+					</li>
+					<li>
+						<span>性別</span>
+						<span>{ helpers.StringOf(basicInfo.Gender) }</span>
+					</li>
+					<li>
+						<span>生年月日</span>
+						<span>{ helpers.DateOf(basicInfo.BirthDate) }</span>
+					</li>
+					<li>
+						<span>雇用日</span>
+						<span>{ helpers.DateOf(basicInfo.HireDate) }</span>
+					</li>
+				</ul>
+			</div>
+		</div>
+    <style>
+      .detailsLayout {
+        display: grid;
+        grid-template-rows: 52px 1fr;
+      }
+    </style>
+	}
+}

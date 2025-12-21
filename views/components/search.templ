@@ -1,6 +1,5 @@
 package components
 
-
 templ Search() {
 	<div class="search-container">
 		<label for="search">
@@ -8,28 +7,4 @@ templ Search() {
 		</label>
 		<input type="search" id="search" name="search" value="" placeholder="Search"/>
 	</div>
-	<style>
-		.search-container {
-			display: flex;
-			align-items: center;
-			gap: var(--spacing-sm);
-			border: 1px solid var(--sidebar-item-hover);
-			border-radius: var(--border-radius-xs);
-			padding: 0 var(--spacing-md);
-			& > label {
-				display: grid;
-				place-items: center;
-			}
-			& > input {
-				flex: 1;
-				height: 100%;
-				padding: var(--spacing-sm);
-				font-size: var(--font-size-sm);
-				color: var(--black);
-				&::placeholder {
-					color: var(--gray);
-				}
-			}
-		}
-	</style>
 }

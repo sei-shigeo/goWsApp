@@ -235,22 +235,178 @@ body {
 }
 
 /* MainContent */
-.mainContent {
+.mainContentLayout {
   flex: 1;
 }
 
 .mainContentLayout {
   display: grid;
-  grid-template-rows: 52px 1fr;
+  grid-template-rows: 52px auto 1fr;
   & > .header {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     align-items: center;
     border-bottom: 1px solid var(--sidebar-item-hover);
-    padding: var(--spacing-sm);
+    padding-inline: var(--spacing-sm);
   }
 
-  & > .content {
+  & > .actions-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
     padding: var(--spacing-sm);
+  }
+  & > .content {
+    padding-inline: var(--spacing-sm);
+  }
+}
+
+/* Card  Components */
+/* 従業員カードコンテナ */
+.employee-card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: var(--spacing-sm);
+
+  /* 個別の従業員カード */
+  & .employee-card {
+    display: grid;
+    grid-template-columns: 1fr 60px;
+    grid-template-rows: var(--card-image-size);
+    border: 1px solid var(--sidebar-item-hover);
+    border-radius: var(--border-radius-xs);
+    background-color: var(--white);
+    transition: box-shadow 0.2s ease;
+
+    &:hover {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* カードのメインコンテンツ部分（クリック可能） */
+    & > .card-content {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      cursor: pointer;
+      background: none;
+      border: none;
+      text-align: left;
+      padding: 0;
+
+      /* 従業員の画像 */
+      & > .card-image {
+        width: var(--card-image-size);
+        height: var(--card-image-size);
+        object-fit: cover;
+        border-top-left-radius: var(--border-radius-xs);
+        border-bottom-left-radius: var(--border-radius-xs);
+      }
+
+      /* 従業員情報リスト */
+      & > .card-info {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        /* 情報アイテム */
+        & > .info-item {
+          display: flex;
+          align-items: center;
+          gap: var(--spacing-sm);
+
+          /* アイコン */
+          & > .material-symbols-outlined {
+            font-size: var(--icon-size-xs);
+            flex-shrink: 0;
+            color: var(--gray);
+          }
+
+          /* テキスト */
+          & > span:last-child {
+            font-size: var(--font-size-xs);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        }
+      }
+    }
+
+    /* 印刷ボタン */
+    & > .card-print-button {
+      display: grid;
+      place-items: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+
+      &:focus-visible {
+        outline: 2px solid var(--primary-color);
+        outline-offset: -2px;
+      }
+
+      /* アイコン */
+      & .material-symbols-outlined {
+        font-size: var(--icon-size-md);
+        color: var(--gray);
+        padding: var(--spacing-sm);
+        border-radius: var(--border-radius-xs);
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background-color: var(--sidebar-item-hover);
+        }
+      }
+    }
+  }
+}
+
+/* Button Components */
+.button-primary {
+  --button-size: 0.5em 1em;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  height: max-content;
+  background-color: var(--primary);
+  color: var(--white);
+  padding: var(--button-size);
+  border-radius: var(--border-radius-xs);
+  & > .material-symbols-outlined {
+    font-size: var(--icon-size-xs);
+    color: var(--white);
+  }
+  & > span {
+    color: var(--white);
+    font-size: var(--font-size-sm);
+  }
+}
+
+/* Search Components */
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  border: 1px solid var(--sidebar-item-hover);
+  border-radius: var(--border-radius-xs);
+  padding: 0 var(--spacing-md);
+  & > label {
+    display: grid;
+    place-items: center;
+  }
+  & > input {
+    flex: 1;
+    height: 100%;
+    padding: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    color: var(--black);
+    &::placeholder {
+      color: var(--gray);
+    }
   }
 }

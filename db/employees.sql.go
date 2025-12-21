@@ -12,7 +12,7 @@ import (
 )
 
 const getEmployeeAccidentRecords = `-- name: GetEmployeeAccidentRecords :many
-SELECT id, employee_id, accident_date, accident_type, accident_location, notes, created_at, updated_at FROM accident_records WHERE employee_id = $1 AND deleted_at IS NULL
+SELECT id, employee_id, accident_date, accident_type, accident_location, notes, created_at, updated_at FROM accident_records WHERE employee_id = $1
 `
 
 // 事故履歴
@@ -46,7 +46,7 @@ func (q *Queries) GetEmployeeAccidentRecords(ctx context.Context, employeeID int
 }
 
 const getEmployeeAddresses = `-- name: GetEmployeeAddresses :many
-SELECT id, owner_type, owner_id, postal_code, prefecture, city, street_address, building_name, is_primary, created_at, updated_at FROM m_addresses WHERE owner_id = $1 AND owner_type = 'employee' AND deleted_at IS NULL
+SELECT id, owner_type, owner_id, postal_code, prefecture, city, street_address, building_name, is_primary, created_at, updated_at FROM m_addresses WHERE owner_id = $1 AND owner_type = 'employee'
 `
 
 // 住所
@@ -83,7 +83,7 @@ func (q *Queries) GetEmployeeAddresses(ctx context.Context, ownerID int32) ([]MA
 }
 
 const getEmployeeBanks = `-- name: GetEmployeeBanks :many
-SELECT id, owner_type, owner_id, bank_code, bank_name, branch_code, branch_name, account_type, account_number, account_name, account_kana, is_active, created_at, updated_at FROM m_banks WHERE owner_id = $1 AND owner_type = 'employee' AND deleted_at IS NULL
+SELECT id, owner_type, owner_id, bank_code, bank_name, branch_code, branch_name, account_type, account_number, account_name, account_kana, is_active, created_at, updated_at FROM m_banks WHERE owner_id = $1 AND owner_type = 'employee'
 `
 
 // 銀行
@@ -124,7 +124,7 @@ func (q *Queries) GetEmployeeBanks(ctx context.Context, ownerID int32) ([]MBank,
 
 const getEmployeeBasicInfo = `-- name: GetEmployeeBasicInfo :one
 SELECT 
-e.id, e.employee_code, e.employee_image_url, e.employee_photo_date, e.last_name, e.first_name, e.last_name_kana, e.first_name_kana, e.legal_name, e.gender, e.birth_date, e.hire_date, e.appointment_date, e.office_id, e.job_type, e.employment_type, e.department, e.position, e.retirement_date, e.retirement_reason, e.death_date, e.death_reason, e.driver_license_no, e.driver_license_type, e.driver_license_issue_date, e.driver_license_expiry, e.driver_license_image_url_front, e.driver_license_image_url_back, e.driving_disabled_date, e.driving_disabled_reason, e.nationality, e.visa_type, e.visa_expiry, e.role_id, e.password_hash, e.password_updated_at, e.failed_login_attempts, e.locked_until, e.last_login_at, e.is_active, e.created_at, e.updated_at, e.deleted_at, 
+e.id, e.employee_code, e.employee_image_url, e.employee_photo_date, e.last_name, e.first_name, e.last_name_kana, e.first_name_kana, e.legal_name, e.gender, e.birth_date, e.hire_date, e.appointment_date, e.office_id, e.job_type, e.employment_type, e.department, e.position, e.retirement_date, e.retirement_reason, e.death_date, e.death_reason, e.driver_license_no, e.driver_license_type, e.driver_license_issue_date, e.driver_license_expiry, e.driver_license_image_url_front, e.driver_license_image_url_back, e.driving_disabled_date, e.driving_disabled_reason, e.nationality, e.visa_type, e.visa_expiry, e.visa_image_url_front, e.visa_image_url_back, e.role_id, e.password_hash, e.password_updated_at, e.failed_login_attempts, e.locked_until, e.last_login_at, e.is_active, e.created_at, e.updated_at, e.deleted_at, 
 co.office_name, 
 co.office_type,
 r.name as role_name
@@ -136,7 +136,7 @@ WHERE e.id = $1 AND e.deleted_at IS NULL
 
 type GetEmployeeBasicInfoRow struct {
 	ID                         int32              `json:"id"`
-	EmployeeCode               *string            `json:"employee_code"`
+	EmployeeCode               string             `json:"employee_code"`
 	EmployeeImageUrl           *string            `json:"employee_image_url"`
 	EmployeePhotoDate          pgtype.Date        `json:"employee_photo_date"`
 	LastName                   string             `json:"last_name"`
@@ -144,7 +144,7 @@ type GetEmployeeBasicInfoRow struct {
 	LastNameKana               *string            `json:"last_name_kana"`
 	FirstNameKana              *string            `json:"first_name_kana"`
 	LegalName                  *string            `json:"legal_name"`
-	Gender                     *string            `json:"gender"`
+	Gender                     string             `json:"gender"`
 	BirthDate                  pgtype.Date        `json:"birth_date"`
 	HireDate                   pgtype.Date        `json:"hire_date"`
 	AppointmentDate            pgtype.Date        `json:"appointment_date"`
@@ -168,6 +168,8 @@ type GetEmployeeBasicInfoRow struct {
 	Nationality                *string            `json:"nationality"`
 	VisaType                   *string            `json:"visa_type"`
 	VisaExpiry                 pgtype.Date        `json:"visa_expiry"`
+	VisaImageUrlFront          *string            `json:"visa_image_url_front"`
+	VisaImageUrlBack           *string            `json:"visa_image_url_back"`
 	RoleID                     *int32             `json:"role_id"`
 	PasswordHash               *string            `json:"password_hash"`
 	PasswordUpdatedAt          pgtype.Timestamptz `json:"password_updated_at"`
@@ -221,6 +223,8 @@ func (q *Queries) GetEmployeeBasicInfo(ctx context.Context, id int32) (GetEmploy
 		&i.Nationality,
 		&i.VisaType,
 		&i.VisaExpiry,
+		&i.VisaImageUrlFront,
+		&i.VisaImageUrlBack,
 		&i.RoleID,
 		&i.PasswordHash,
 		&i.PasswordUpdatedAt,
@@ -262,7 +266,7 @@ type GetEmployeeCardListParams struct {
 
 type GetEmployeeCardListRow struct {
 	ID               int32   `json:"id"`
-	EmployeeCode     *string `json:"employee_code"`
+	EmployeeCode     string  `json:"employee_code"`
 	EmployeeImageUrl *string `json:"employee_image_url"`
 	LastName         string  `json:"last_name"`
 	FirstName        string  `json:"first_name"`
@@ -299,7 +303,7 @@ func (q *Queries) GetEmployeeCardList(ctx context.Context, arg GetEmployeeCardLi
 }
 
 const getEmployeeCareerRecords = `-- name: GetEmployeeCareerRecords :many
-SELECT id, employee_id, career_type, career_date, career_institution, notes, created_at, updated_at FROM career_records WHERE employee_id = $1 AND deleted_at IS NULL
+SELECT id, employee_id, company_name, start_date, end_date, job_type, retirement_reason, created_at, updated_at FROM career_records WHERE employee_id = $1
 `
 
 // 職歴
@@ -315,10 +319,11 @@ func (q *Queries) GetEmployeeCareerRecords(ctx context.Context, employeeID int32
 		if err := rows.Scan(
 			&i.ID,
 			&i.EmployeeID,
-			&i.CareerType,
-			&i.CareerDate,
-			&i.CareerInstitution,
-			&i.Notes,
+			&i.CompanyName,
+			&i.StartDate,
+			&i.EndDate,
+			&i.JobType,
+			&i.RetirementReason,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -333,7 +338,7 @@ func (q *Queries) GetEmployeeCareerRecords(ctx context.Context, employeeID int32
 }
 
 const getEmployeeEducationRecords = `-- name: GetEmployeeEducationRecords :many
-SELECT id, employee_id, education_type, education_date, education_institution, notes, created_at, updated_at FROM education_records WHERE employee_id = $1 AND deleted_at IS NULL
+SELECT id, employee_id, education_type, education_date, education_institution, notes, created_at, updated_at FROM education_records WHERE employee_id = $1
 `
 
 // 学歴
@@ -367,7 +372,7 @@ func (q *Queries) GetEmployeeEducationRecords(ctx context.Context, employeeID in
 }
 
 const getEmployeeEmails = `-- name: GetEmployeeEmails :many
-SELECT id, owner_type, owner_id, email, is_primary, created_at, updated_at FROM m_emails WHERE owner_id = $1 AND owner_type = 'employee' AND deleted_at IS NULL
+SELECT id, owner_type, owner_id, email, is_primary, created_at, updated_at FROM m_emails WHERE owner_id = $1 AND owner_type = 'employee'
 `
 
 // メールアドレス
@@ -400,7 +405,7 @@ func (q *Queries) GetEmployeeEmails(ctx context.Context, ownerID int32) ([]MEmai
 }
 
 const getEmployeeHealthCheckupRecords = `-- name: GetEmployeeHealthCheckupRecords :many
-SELECT id, employee_id, checkup_date, checkup_type, overall_result, medical_institution, notes, created_at, updated_at FROM health_checkup_records WHERE employee_id = $1 AND deleted_at IS NULL
+SELECT id, employee_id, checkup_date, checkup_type, overall_result, medical_institution, notes, created_at, updated_at FROM health_checkup_records WHERE employee_id = $1
 `
 
 // 健康診断
@@ -435,7 +440,7 @@ func (q *Queries) GetEmployeeHealthCheckupRecords(ctx context.Context, employeeI
 }
 
 const getEmployeeInsuranceRecords = `-- name: GetEmployeeInsuranceRecords :many
-SELECT id, employee_id, insurance_type, insurance_date, insurance_image_url, created_at, updated_at FROM insurance_records WHERE employee_id = $1 AND deleted_at IS NULL
+SELECT id, employee_id, insurance_type, insurance_date, insurance_number, insurance_image_url, created_at, updated_at FROM insurance_records WHERE employee_id = $1
 `
 
 // 保険
@@ -453,6 +458,7 @@ func (q *Queries) GetEmployeeInsuranceRecords(ctx context.Context, employeeID in
 			&i.EmployeeID,
 			&i.InsuranceType,
 			&i.InsuranceDate,
+			&i.InsuranceNumber,
 			&i.InsuranceImageUrl,
 			&i.CreatedAt,
 			&i.UpdatedAt,
@@ -468,7 +474,7 @@ func (q *Queries) GetEmployeeInsuranceRecords(ctx context.Context, employeeID in
 }
 
 const getEmployeePhones = `-- name: GetEmployeePhones :many
-SELECT id, owner_type, owner_id, phone_number, phone_type, is_primary, created_at, updated_at FROM m_phones WHERE owner_id = $1 AND owner_type = 'employee' AND deleted_at IS NULL
+SELECT id, owner_type, owner_id, phone_number, phone_type, is_primary, created_at, updated_at FROM m_phones WHERE owner_id = $1 AND owner_type = 'employee'
 `
 
 // 電話番号
@@ -502,7 +508,7 @@ func (q *Queries) GetEmployeePhones(ctx context.Context, ownerID int32) ([]MPhon
 }
 
 const getEmployeeQualificationRecords = `-- name: GetEmployeeQualificationRecords :many
-SELECT id, employee_id, qualification_type, qualification_date, qualification_number, qualification_image_url, created_at, updated_at FROM qualification_records WHERE employee_id = $1 AND deleted_at IS NULL
+SELECT id, employee_id, qualification_type, qualification_date, qualification_number, qualification_image_url, created_at, updated_at FROM qualification_records WHERE employee_id = $1
 `
 
 // 資格
@@ -536,7 +542,7 @@ func (q *Queries) GetEmployeeQualificationRecords(ctx context.Context, employeeI
 }
 
 const getEmployeeTrainingRecords = `-- name: GetEmployeeTrainingRecords :many
-SELECT id, employee_id, training_type, training_date, training_hours, instructor, notes, created_at, updated_at FROM training_records WHERE employee_id = $1 AND deleted_at IS NULL
+SELECT id, employee_id, training_type, training_date, training_hours, instructor, notes, created_at, updated_at FROM training_records WHERE employee_id = $1
 `
 
 // 教育訓練
@@ -571,7 +577,7 @@ func (q *Queries) GetEmployeeTrainingRecords(ctx context.Context, employeeID int
 }
 
 const getEmployeeViolationRecords = `-- name: GetEmployeeViolationRecords :many
-SELECT id, employee_id, violation_date, violation_type, violation_location, notes, created_at, updated_at FROM violation_records WHERE employee_id = $1 AND deleted_at IS NULL
+SELECT id, employee_id, violation_date, violation_type, violation_location, notes, created_at, updated_at FROM violation_records WHERE employee_id = $1
 `
 
 // 違反履歴

@@ -70,6 +70,7 @@ func main() {
 	mux.HandleFunc("GET /employees", handlers.EmployeesHandler)
 	mux.HandleFunc("GET /employees/print/{id}", handlers.EmployeesPrintHandler)
 	mux.HandleFunc("GET /employees/details/{id}", handlers.EmployeesBasicInfoHandler)
+	mux.HandleFunc("GET /employees/create", handlers.EmployeesCreateHandler)
 
 	server := http.Server{
 		Addr:    ":8080",

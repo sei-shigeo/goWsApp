@@ -28,48 +28,48 @@ WHERE e.id = $1 AND e.deleted_at IS NULL;
 
 -- 住所
 -- name: GetEmployeeAddresses :many
-SELECT * FROM m_addresses WHERE owner_id = $1 AND owner_type = 'employee' AND deleted_at IS NULL;
+SELECT * FROM m_addresses WHERE owner_id = $1 AND owner_type = 'employee';
 
 -- メールアドレス
 -- name: GetEmployeeEmails :many
-SELECT * FROM m_emails WHERE owner_id = $1 AND owner_type = 'employee' AND deleted_at IS NULL;
+SELECT * FROM m_emails WHERE owner_id = $1 AND owner_type = 'employee';
 
 -- 電話番号
 -- name: GetEmployeePhones :many
-SELECT * FROM m_phones WHERE owner_id = $1 AND owner_type = 'employee' AND deleted_at IS NULL;
+SELECT * FROM m_phones WHERE owner_id = $1 AND owner_type = 'employee';
 
 -- 銀行
 -- name: GetEmployeeBanks :many
-SELECT * FROM m_banks WHERE owner_id = $1 AND owner_type = 'employee' AND deleted_at IS NULL;
+SELECT * FROM m_banks WHERE owner_id = $1 AND owner_type = 'employee';
 
 -- 教育訓練
 -- name: GetEmployeeTrainingRecords :many
-SELECT * FROM training_records WHERE employee_id = $1 AND deleted_at IS NULL;
+SELECT * FROM training_records WHERE employee_id = $1;
 
 -- 健康診断
 -- name: GetEmployeeHealthCheckupRecords :many
-SELECT * FROM health_checkup_records WHERE employee_id = $1 AND deleted_at IS NULL;
+SELECT * FROM health_checkup_records WHERE employee_id = $1;
 
 -- 資格
 -- name: GetEmployeeQualificationRecords :many
-SELECT * FROM qualification_records WHERE employee_id = $1 AND deleted_at IS NULL;
+SELECT * FROM qualification_records WHERE employee_id = $1;
 
 -- 保険
 -- name: GetEmployeeInsuranceRecords :many
-SELECT * FROM insurance_records WHERE employee_id = $1 AND deleted_at IS NULL;
+SELECT * FROM insurance_records WHERE employee_id = $1;
 
 -- 学歴
 -- name: GetEmployeeEducationRecords :many
-SELECT * FROM education_records WHERE employee_id = $1 AND deleted_at IS NULL;
+SELECT * FROM education_records WHERE employee_id = $1;
 
 -- 職歴
 -- name: GetEmployeeCareerRecords :many
-SELECT * FROM career_records WHERE employee_id = $1 AND deleted_at IS NULL;
+SELECT * FROM career_records WHERE employee_id = $1;
 
 -- 事故履歴
 -- name: GetEmployeeAccidentRecords :many 
-SELECT * FROM accident_records WHERE employee_id = $1 AND deleted_at IS NULL;
+SELECT * FROM accident_records WHERE employee_id = $1;
 
 -- 違反履歴
 -- name: GetEmployeeViolationRecords :many
-SELECT * FROM violation_records WHERE employee_id = $1 AND deleted_at IS NULL;
+SELECT * FROM violation_records WHERE employee_id = $1;

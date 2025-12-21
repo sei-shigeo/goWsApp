@@ -1,0 +1,30 @@
+package components
+
+type ButtonProps struct {
+	Icon string
+	Label string
+  OnClick string
+}
+
+func ButtonNew(props ButtonProps) ButtonProps {
+	if props.Icon == "" {
+		props.Icon = ""
+	}
+	if props.Label == "" {
+		props.Label = ""
+	}
+	if props.OnClick == "" {
+		props.OnClick = ""
+	}
+	return props
+}
+
+templ Button(props ButtonProps) {
+	{{ props := ButtonNew(props) }}
+	<button type="button" class="button-primary" data-on:click={ props.OnClick }>
+		if props.Icon != "" {
+			<span class="material-symbols-outlined">{ props.Icon }</span>
+		}
+		<span>{ props.Label }</span>
+	</button>
+}

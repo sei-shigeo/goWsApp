@@ -1,0 +1,28 @@
+package components
+
+
+type ContentHeaderProps struct {
+	Title          string
+	Search         bool
+}
+
+// default設定
+func ContentHeaderNew(props ContentHeaderProps) ContentHeaderProps {
+	if props.Title == "" {
+		props.Title = ""
+	}
+	return props
+}
+
+templ ContentHeaderSection(props ContentHeaderProps) {
+	{{ props := ContentHeaderNew(props) }}
+	<div class="header">
+		<h1>{ props.Title }</h1>
+		<div class="search-section">
+			if props.Search {
+				@Search()
+			}
+		</div>
+		@LoginAccountStatus()
+	</div>
+}

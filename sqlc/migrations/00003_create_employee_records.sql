@@ -70,6 +70,7 @@ CREATE TABLE IF NOT EXISTS insurance_records (
     employee_id INTEGER NOT NULL REFERENCES employees(id) ON DELETE CASCADE,
     insurance_type VARCHAR(50) CHECK (insurance_type IN ('健康保険', '厚生年金', '雇用保険', 'マイナンバー')),
     insurance_date DATE NOT NULL,
+    insurance_number VARCHAR(20),
     insurance_image_url VARCHAR(255),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -77,13 +78,15 @@ CREATE TABLE IF NOT EXISTS insurance_records (
 
 CREATE INDEX idx_insurance_records_employee ON insurance_records(employee_id);
 
-INSERT INTO insurance_records (employee_id, insurance_type, insurance_date) VALUES 
-    (1, '健康保険', '2024-04-01'),
-    (1, '厚生年金', '2024-04-01'),
-    (1, '雇用保険', '2024-04-01'),
-    (2, '健康保険', '2024-05-01'),
-    (2, '厚生年金', '2024-05-01'),
-    (2, '雇用保険', '2024-05-01');
+INSERT INTO insurance_records (employee_id, insurance_type, insurance_date, insurance_number) VALUES 
+    (1, '健康保険', '2024-04-01', '12345678901'),
+    (1, '厚生年金', '2024-04-01', '12345678902'),
+    (1, '雇用保険', '2024-04-01', '12345678903'),
+    (1, 'マイナンバー', '2024-04-01', '12345678904'),
+    (2, '健康保険', '2024-05-01', '12345678905'),
+    (2, '厚生年金', '2024-05-01', '12345678906'),
+    (2, '雇用保険', '2024-05-01', '12345678907'),
+    (2, 'マイナンバー', '2024-05-01', '12345678908');
 
 -- 学歴テーブル
 CREATE TABLE IF NOT EXISTS education_records (
@@ -100,26 +103,33 @@ CREATE TABLE IF NOT EXISTS education_records (
 CREATE INDEX idx_education_records_employee ON education_records(employee_id);
 
 INSERT INTO education_records (employee_id, education_type, education_date, education_institution, notes) VALUES 
-    (1, '高等学校', '2015-03-01', '愛知県立名古屋商業高等学校', '卒業'),
-    (2, '大学', '2019-03-01', '名古屋大学経済学部', '卒業');
+    (1, '中学校', '2012-04-01', '愛知県立名古屋商業中学校', '卒業'),
+    (1, '高等学校', '2015-04-01', '愛知県立名古屋商業高等学校', '卒業'),
+    (1, '大学', '2018-04-01', '愛知県立名古屋商業大学', '卒業'),
+    (2, '中学校', '2013-04-01', '愛知県立名古屋商業中学校', '卒業'),
+    (2, '高等学校', '2016-04-01', '愛知県立名古屋商業高等学校', '卒業'),
+    (2, '大学', '2019-04-01', '名古屋大学経済学部', '卒業');
 
 -- 職歴テーブル
 CREATE TABLE IF NOT EXISTS career_records (
     id SERIAL PRIMARY KEY,
     employee_id INTEGER NOT NULL REFERENCES employees(id) ON DELETE CASCADE,
-    career_type VARCHAR(50) CHECK (career_type IN ('会社', '店舗', 'その他')),
-    career_date DATE NOT NULL,
-    career_institution VARCHAR(200),
-    notes TEXT,
+    company_name VARCHAR(50), -- 会社名
+    start_date DATE NOT NULL, -- 勤務開始日
+    end_date DATE, -- 勤務終了日
+    job_type VARCHAR(50), -- 職種
+    retirement_reason TEXT, -- 辞めた理由
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX idx_career_records_employee ON career_records(employee_id);
 
-INSERT INTO career_records (employee_id, career_type, career_date, career_institution, notes) VALUES 
-    (1, '会社', '2015-04-01', '株式会社東海運輸', '運転手として3年勤務'),
-    (2, '会社', '2019-04-01', '名古屋物流センター', '事務職として2年勤務');
+INSERT INTO career_records (employee_id, company_name, start_date, end_date, job_type, retirement_reason) VALUES 
+    (1, '株式会社エース物流', '2015-04-01', '2018-04-01', '運転手', '会社が倒産したため'),
+    (1, '株式会社太陽商会', '2018-04-01', '2021-04-01', '運転手', '会社が倒産したため'),
+    (1, '株式会社サンシャイン物流', '2021-04-01', '2024-04-01', '運転手', '会社が倒産したため'),
+    (2, '名古屋物流センター', '2019-04-01', '2021-04-01', '運転手', '会社が倒産したため');
 
 -- 事故履歴テーブル
 CREATE TABLE IF NOT EXISTS accident_records (

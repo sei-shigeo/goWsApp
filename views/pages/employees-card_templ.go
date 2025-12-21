@@ -11,6 +11,7 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"fmt"
 	"github.com/sei-shigeo/webApp/db"
+	"github.com/sei-shigeo/webApp/helpers"
 )
 
 func EmployeesCard(employees []db.GetEmployeeCardListRow) templ.Component {
@@ -34,7 +35,7 @@ func EmployeesCard(employees []db.GetEmployeeCardListRow) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"card-container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"employee-card-container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -51,7 +52,7 @@ func EmployeesCard(employees []db.GetEmployeeCardListRow) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div><style>\n\t\t.card-container {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: repeat(auto-fill, minmax(350px, 1fr));\n\t\t\tgap: var(--spacing-sm);\n\t\t}\n\t\t.card {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: var(--card-image-size) 1fr auto;\n\t\t\tgrid-template-rows: var(--card-image-size);\n\t\t\talign-items: center;\n\t\t\tborder: 1px solid var(--sidebar-item-hover);\n\t\t\tborder-radius: var(--border-radius-xs);\n\t\t\tbackground-color: var(--white);\n\t\t\ttransition: box-shadow 0.2s ease;\n\n\t\t\t&:hover {\n\t\t\t\tbox-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);\n\t\t\t}\n\n\t\t\t& > .image {\n\t\t\t\twidth: var(--card-image-size);\n\t\t\t\theight: var(--card-image-size);\n\t\t\t\tobject-fit: cover;\n\t\t\t\tborder-top-left-radius: var(--border-radius-xs);\n\t\t\t\tborder-bottom-left-radius: var(--border-radius-xs);\n\t\t\t}\n\n\t\t\t& > .content-list {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: column;\n\t\t\t\tpadding-inline: var(--spacing-md);\n\t\t\t\toverflow: hidden;\n\n\t\t\t\t& > .item {\n\t\t\t\t\tdisplay: flex;\n\t\t\t\t\talign-items: center;\n\t\t\t\t\tgap: var(--spacing-sm);\n\t\t\t\t\tmin-width: 0;\n\n\t\t\t\t\t& > .material-symbols-outlined {\n\t\t\t\t\t\tfont-size: var(--icon-size-xs);\n\t\t\t\t\t\tflex-shrink: 0;\n\t\t\t\t\t\tcolor: var(--gray);\n\t\t\t\t\t}\n\n\t\t\t\t\t& > span:last-child {\n\t\t\t\t\t\tfont-size: var(--font-size-xs);\n\t\t\t\t\t\toverflow: hidden;\n\t\t\t\t\t\ttext-overflow: ellipsis;\n\t\t\t\t\t\twhite-space: nowrap;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\n\t\t\t& > .print-button {\n\t\t\t\tcolor: var(--black);\n\t\t\t\tpadding: var(--spacing-sm);\n\t\t\t\tborder-radius: var(--border-radius-xs);\n\t\t\t\ttransition: background-color 0.2s ease;\n\n\t\t\t\t&:hover {\n\t\t\t\t\tbackground-color: var(--sidebar-item-hover);\n\t\t\t\t}\n\n\t\t\t\t&:focus-visible {\n\t\t\t\t\toutline: 2px solid var(--primary);\n\t\t\t\t\toutline-offset: 2px;\n\t\t\t\t}\n\n\t\t\t\t& > .material-symbols-outlined {\n\t\t\t\t\tfont-size: var(--icon-size-md);\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -80,143 +81,98 @@ func EmployeeCard(employee db.GetEmployeeCardListRow) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"card\" data-on:click=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"employee-card\"><button type=\"button\" class=\"card-content\" data-on:click=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("@get('/employees/details/%d')", employee.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/pages/employees-card.templ`, Line: 99, Col: 92}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/pages/employees-card.templ`, Line: 25, Col: 118}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\"><img class=\"image\" src=\"https://placehold.jp/150x150.png\" alt=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\"><img class=\"card-image\" src=\"https://placehold.jp/150x150.png\" alt=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("Employee %d: %s", employee.ID, employee.LastName+" "+employee.FirstName))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/pages/employees-card.templ`, Line: 103, Col: 94}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/pages/employees-card.templ`, Line: 29, Col: 95}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\"><ul class=\"content-list\"><li class=\"item\"><span class=\"material-symbols-outlined\">badge</span> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\"><ul class=\"card-info\"><li class=\"info-item\"><span class=\"material-symbols-outlined\">badge</span> <span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if employee.EmployeeCode != nil {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<span>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var5 string
-			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(*employee.EmployeeCode)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/pages/employees-card.templ`, Line: 109, Col: 35}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</span>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<span>-</span>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
+		var templ_7745c5c3_Var5 string
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(employee.EmployeeCode)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/pages/employees-card.templ`, Line: 34, Col: 34}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</li><li class=\"item\"><span class=\"material-symbols-outlined\">person</span> <span>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</span></li><li class=\"info-item\"><span class=\"material-symbols-outlined\">person</span> <span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(employee.LastName + " " + employee.FirstName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/pages/employees-card.templ`, Line: 116, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/pages/employees-card.templ`, Line: 38, Col: 57}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</span></li><li class=\"item\"><span class=\"material-symbols-outlined\">phone</span> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</span></li><li class=\"info-item\"><span class=\"material-symbols-outlined\">phone</span> <span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if employee.PhoneNumber != nil {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<span>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var7 string
-			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(*employee.PhoneNumber)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/pages/employees-card.templ`, Line: 121, Col: 34}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</span>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<span>-</span>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
+		var templ_7745c5c3_Var7 string
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(helpers.StringOf(employee.PhoneNumber))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/pages/employees-card.templ`, Line: 42, Col: 51}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</li><li class=\"item\"><span class=\"material-symbols-outlined\">email</span> ")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if employee.Email != nil {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<span>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var8 string
-			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(*employee.Email)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/pages/employees-card.templ`, Line: 129, Col: 28}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</span>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<span>-</span>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</span></li><li class=\"info-item\"><span class=\"material-symbols-outlined\">email</span> <span>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</li></ul><a class=\"print-button\" href=\"")
+		var templ_7745c5c3_Var8 string
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(helpers.StringOf(employee.Email))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/pages/employees-card.templ`, Line: 46, Col: 45}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</span></li></ul></button> <a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var9 templ.SafeURL
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinURLErrs(fmt.Sprintf("/employees/print/%d", employee.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/pages/employees-card.templ`, Line: 135, Col: 80}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/pages/employees-card.templ`, Line: 50, Col: 59}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" target=\"_blank\"><span class=\"material-symbols-outlined\">print</span></a></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" target=\"_blank\" class=\"card-print-button\"><span class=\"material-symbols-outlined\">print</span></a></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

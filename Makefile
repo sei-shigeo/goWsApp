@@ -34,3 +34,8 @@ live/sync_assets:
 # start all 5 watch processes in parallel.
 live: 
 	make -j3 live/templ live/server live/sync_assets
+
+
+# goose reset && goose up && sqlc generate
+up:
+	goose reset && goose up && sqlc generate

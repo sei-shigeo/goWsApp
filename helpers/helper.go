@@ -10,7 +10,7 @@ func StringOf(s *string) string {
 }
 
 func DateOf(date pgtype.Date) string {
-	if !date.Valid {
+	if !date.Valid && date.Time.IsZero() {
 		return "-"
 	}
 	return date.Time.Format("2006-01-02")

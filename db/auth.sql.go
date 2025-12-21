@@ -196,7 +196,7 @@ AND e.deleted_at IS NULL
 
 type GetEmployeeForLoginRow struct {
 	ID                  int32              `json:"id"`
-	EmployeeCode        *string            `json:"employee_code"`
+	EmployeeCode        string             `json:"employee_code"`
 	LastName            string             `json:"last_name"`
 	FirstName           string             `json:"first_name"`
 	PasswordHash        *string            `json:"password_hash"`
@@ -212,7 +212,7 @@ type GetEmployeeForLoginRow struct {
 // 認証・セッション管理クエリ
 // ==============================
 // 従業員コードでログイン情報を取得
-func (q *Queries) GetEmployeeForLogin(ctx context.Context, employeeCode *string) (GetEmployeeForLoginRow, error) {
+func (q *Queries) GetEmployeeForLogin(ctx context.Context, employeeCode string) (GetEmployeeForLoginRow, error) {
 	row := q.db.QueryRow(ctx, getEmployeeForLogin, employeeCode)
 	var i GetEmployeeForLoginRow
 	err := row.Scan(
@@ -362,7 +362,7 @@ type GetSessionByTokenRow struct {
 	ExpiresAt      pgtype.Timestamptz `json:"expires_at"`
 	CreatedAt      pgtype.Timestamptz `json:"created_at"`
 	LastAccessedAt pgtype.Timestamptz `json:"last_accessed_at"`
-	EmployeeCode   *string            `json:"employee_code"`
+	EmployeeCode   string             `json:"employee_code"`
 	LastName       string             `json:"last_name"`
 	FirstName      string             `json:"first_name"`
 	RoleID         *int32             `json:"role_id"`

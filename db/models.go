@@ -20,14 +20,15 @@ type AccidentRecord struct {
 }
 
 type CareerRecord struct {
-	ID                int32              `json:"id"`
-	EmployeeID        int32              `json:"employee_id"`
-	CareerType        *string            `json:"career_type"`
-	CareerDate        pgtype.Date        `json:"career_date"`
-	CareerInstitution *string            `json:"career_institution"`
-	Notes             *string            `json:"notes"`
-	CreatedAt         pgtype.Timestamptz `json:"created_at"`
-	UpdatedAt         pgtype.Timestamptz `json:"updated_at"`
+	ID               int32              `json:"id"`
+	EmployeeID       int32              `json:"employee_id"`
+	CompanyName      *string            `json:"company_name"`
+	StartDate        pgtype.Date        `json:"start_date"`
+	EndDate          pgtype.Date        `json:"end_date"`
+	JobType          *string            `json:"job_type"`
+	RetirementReason *string            `json:"retirement_reason"`
+	CreatedAt        pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt        pgtype.Timestamptz `json:"updated_at"`
 }
 
 type Company struct {
@@ -222,7 +223,7 @@ type EducationRecord struct {
 
 type Employee struct {
 	ID                         int32              `json:"id"`
-	EmployeeCode               *string            `json:"employee_code"`
+	EmployeeCode               string             `json:"employee_code"`
 	EmployeeImageUrl           *string            `json:"employee_image_url"`
 	EmployeePhotoDate          pgtype.Date        `json:"employee_photo_date"`
 	LastName                   string             `json:"last_name"`
@@ -230,7 +231,7 @@ type Employee struct {
 	LastNameKana               *string            `json:"last_name_kana"`
 	FirstNameKana              *string            `json:"first_name_kana"`
 	LegalName                  *string            `json:"legal_name"`
-	Gender                     *string            `json:"gender"`
+	Gender                     string             `json:"gender"`
 	BirthDate                  pgtype.Date        `json:"birth_date"`
 	HireDate                   pgtype.Date        `json:"hire_date"`
 	AppointmentDate            pgtype.Date        `json:"appointment_date"`
@@ -254,6 +255,8 @@ type Employee struct {
 	Nationality                *string            `json:"nationality"`
 	VisaType                   *string            `json:"visa_type"`
 	VisaExpiry                 pgtype.Date        `json:"visa_expiry"`
+	VisaImageUrlFront          *string            `json:"visa_image_url_front"`
+	VisaImageUrlBack           *string            `json:"visa_image_url_back"`
 	RoleID                     *int32             `json:"role_id"`
 	PasswordHash               *string            `json:"password_hash"`
 	PasswordUpdatedAt          pgtype.Timestamptz `json:"password_updated_at"`
@@ -283,6 +286,7 @@ type InsuranceRecord struct {
 	EmployeeID        int32              `json:"employee_id"`
 	InsuranceType     *string            `json:"insurance_type"`
 	InsuranceDate     pgtype.Date        `json:"insurance_date"`
+	InsuranceNumber   *string            `json:"insurance_number"`
 	InsuranceImageUrl *string            `json:"insurance_image_url"`
 	CreatedAt         pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt         pgtype.Timestamptz `json:"updated_at"`
@@ -346,13 +350,13 @@ type MBank struct {
 	ID            int32              `json:"id"`
 	OwnerType     string             `json:"owner_type"`
 	OwnerID       int32              `json:"owner_id"`
-	BankCode      string             `json:"bank_code"`
-	BankName      string             `json:"bank_name"`
+	BankCode      *string            `json:"bank_code"`
+	BankName      *string            `json:"bank_name"`
 	BranchCode    *string            `json:"branch_code"`
 	BranchName    *string            `json:"branch_name"`
-	AccountType   int16              `json:"account_type"`
-	AccountNumber string             `json:"account_number"`
-	AccountName   string             `json:"account_name"`
+	AccountType   *int16             `json:"account_type"`
+	AccountNumber *string            `json:"account_number"`
+	AccountName   *string            `json:"account_name"`
 	AccountKana   *string            `json:"account_kana"`
 	IsActive      *bool              `json:"is_active"`
 	CreatedAt     pgtype.Timestamptz `json:"created_at"`

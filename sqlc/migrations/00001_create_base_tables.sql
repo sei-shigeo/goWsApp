@@ -130,7 +130,7 @@ INSERT INTO company_offices (company_id, office_code, office_name, office_type, 
 -- 従業員テーブル
 CREATE TABLE IF NOT EXISTS employees (
     id SERIAL PRIMARY KEY,
-    employee_code VARCHAR(50) UNIQUE,
+    employee_code VARCHAR(50) NOT NULL UNIQUE,
     
     -- 基本情報
     employee_image_url VARCHAR(255),
@@ -140,12 +140,12 @@ CREATE TABLE IF NOT EXISTS employees (
     last_name_kana VARCHAR(100),
     first_name_kana VARCHAR(100),
     legal_name VARCHAR(200),
-    gender VARCHAR(20) CHECK (gender IN ('男', '女', 'その他')),
+    gender VARCHAR(20) NOT NULL CHECK (gender IN ('男', '女', 'その他')),
     
     -- 雇用情報
-    birth_date DATE,
-    hire_date DATE NOT NULL,
-    appointment_date DATE,
+    birth_date DATE, --生年月日
+    hire_date DATE,--雇用日
+    appointment_date DATE, --選任日
     office_id INTEGER REFERENCES company_offices(id) ON DELETE SET NULL, -- 所属事業所
     job_type VARCHAR(20) CHECK (job_type IN ('運転者', '運行管理者', '整備管理者', '経理', '営業', '事務', 'その他')),
     employment_type VARCHAR(20) CHECK (employment_type IN ('正社員', 'アルバイト', '業務委託', '派遣', 'パート', '嘱託', 'その他')),
@@ -159,19 +159,21 @@ CREATE TABLE IF NOT EXISTS employees (
     death_reason TEXT,
     
     -- 運転免許情報
-    driver_license_no VARCHAR(50),
-    driver_license_type VARCHAR(50),
-    driver_license_issue_date DATE,
-    driver_license_expiry DATE,
-    driver_license_image_url_front VARCHAR(255),
-    driver_license_image_url_back VARCHAR(255),
-    driving_disabled_date DATE,
-    driving_disabled_reason TEXT,
+    driver_license_no VARCHAR(50), --運転免許番号
+    driver_license_type VARCHAR(50), --運転免許種別
+    driver_license_issue_date DATE, --運転免許発行日
+    driver_license_expiry DATE, --運転免許有効期限
+    driver_license_image_url_front VARCHAR(255), --運転免許画像（前）
+    driver_license_image_url_back VARCHAR(255), --運転免許画像（後）
+    driving_disabled_date DATE, --運転停止日
+    driving_disabled_reason TEXT, --運転停止理由
     
     -- 在留資格
     nationality VARCHAR(50) DEFAULT '日本',
     visa_type VARCHAR(50),
     visa_expiry DATE,
+    visa_image_url_front VARCHAR(255),
+    visa_image_url_back VARCHAR(255),
     
     -- 認証情報
     role_id INTEGER REFERENCES m_roles(id) ON DELETE SET NULL, -- 権限（管理者/一般）
@@ -194,9 +196,29 @@ CREATE INDEX idx_employees_office ON employees(office_id);
 CREATE INDEX idx_employees_role ON employees(role_id);
 CREATE INDEX idx_employees_active ON employees(is_active);
 
-INSERT INTO employees (employee_code, last_name, first_name, last_name_kana, first_name_kana, legal_name, hire_date, office_id, role_id, password_hash) VALUES 
-    ('E-001', '茂雄', '清', 'シゲオ', 'セイ', 'Rafael Shigueo Sei', CURRENT_DATE, 1, 1, '$2a$10$dummy_hash_for_admin'),
-    ('E-002', 'アケミ', '伴', 'アケミ', 'バン', 'Akemi Ban', CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user');
+INSERT INTO employees (
+    employee_code, 
+    last_name, first_name, last_name_kana, first_name_kana, legal_name, 
+    gender, birth_date, 
+    hire_date, office_id, role_id, password_hash) VALUES 
+    ('E-001', '茂雄', '清', 'シゲオ', 'セイ', 'Rafael Shigueo Sei', '男', CURRENT_DATE, CURRENT_DATE, 1, 1, '$2a$10$dummy_hash_for_admin'),
+    ('E-002', 'アケミ', '伴', 'アケミ', 'バン', 'Akemi Ban', '女', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-003', 'マサヒロ', '藤原', 'マサヒロ', 'フジワラ', 'Masahiro Fujiwara', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-004', 'ヒロシ', '田中', 'ヒロシ', 'タナカ', 'Hiroshi Tanaka', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-005', 'タカシ', '渡辺', 'タカシ', 'ワタナベ', 'Takashi Watanabe', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-006', 'ナオミ', '山田', 'ナオミ', 'ヤマダ', 'Naomi Yamada', '女', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-007', 'マサユキ', '佐藤', 'マサユキ', 'サトウ', 'Masayuki Sato', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-008', 'ナオト', '鈴木', 'ナオト', 'スズキ', 'Naoto Suzuki', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-009', 'ヒロミ', '高橋', 'ヒロミ', 'タカハシ', 'Hiroshi Takahashi', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-010', 'ナオユキ', '伊藤', 'ナオユキ', 'イトウ', 'Naoyuki Ito', '女', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-011', 'マサユキ', '渡辺', 'マサユキ', 'ワタナベ', 'Masayuki Watanabe', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-012', 'ナオミ', '山田', 'ナオミ', 'ヤマダ', 'Naomi Yamada', '女', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-013', 'マサユキ', '佐藤', 'マサユキ', 'サトウ', 'Masayuki Sato', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-014', 'ナオト', '鈴木', 'ナオト', 'スズキ', 'Naoto Suzuki', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-015', 'ヒロミ', '高橋', 'ヒロミ', 'タカハシ', 'Hiroshi Takahashi', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-016', 'ナオユキ', '伊藤', 'ナオユキ', 'イトウ', 'Naoyuki Ito', '女', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-017', 'マサユキ', '渡辺', 'マサユキ', 'ワタナベ', 'Masayuki Watanabe', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-018', 'ナオミ', '山田', 'ナオミ', 'ヤマダ', 'Naomi Yamada', '女', CURRENT_DATE, NULL, 1, 2, '$2a$10$dummy_hash_for_user');
 
 -- company_officesのmanager_idに外部キー制約を追加
 ALTER TABLE company_offices 

@@ -8,15 +8,19 @@ import (
 
 templ Employees(employees []db.GetEmployeeCardListRow) {
 	@layouts.Base() {
-		<div class="mainContentLayout">
-			<div class="header">
-				<h1>Employees</h1>
-				@components.Search()
-				@components.AccountContainer()
-			</div>
-			<div class="content">
-				@EmployeesCard(employees)
-			</div>
+		@components.ContentHeaderSection(components.ContentHeaderProps{
+			Title:  "従業員一覧",
+			Search: true,
+		})
+		<div class="actions-container">
+			@components.Button(components.ButtonProps{
+				Icon:    "add",
+				Label:   "従業員作成",
+				OnClick: "@get('/employees/create')",
+			})
+		</div>
+		<div class="content">
+			@EmployeesCard(employees)
 		</div>
 	}
 }

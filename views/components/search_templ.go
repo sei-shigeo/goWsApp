@@ -29,7 +29,7 @@ func Search() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"search-container\"><label for=\"search\"><span class=\"material-symbols-outlined\">search</span></label> <input type=\"search\" id=\"search\" name=\"search\" value=\"\" placeholder=\"Search\"></div><style>\n\t\t.search-container {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: var(--spacing-sm);\n\t\t\tborder: 1px solid var(--sidebar-item-hover);\n\t\t\tborder-radius: var(--border-radius-xs);\n\t\t\tpadding: 0 var(--spacing-md);\n\t\t\t& > label {\n\t\t\t\tdisplay: grid;\n\t\t\t\tplace-items: center;\n\t\t\t}\n\t\t\t& > input {\n\t\t\t\tflex: 1;\n\t\t\t\theight: 100%;\n\t\t\t\tpadding: var(--spacing-sm);\n\t\t\t\tfont-size: var(--font-size-sm);\n\t\t\t\tcolor: var(--black);\n\t\t\t\t&::placeholder {\n\t\t\t\t\tcolor: var(--gray);\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"search-container\"><label for=\"search\"><span class=\"material-symbols-outlined\">search</span></label> <input type=\"search\" id=\"search\" name=\"search\" value=\"\" placeholder=\"Search\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

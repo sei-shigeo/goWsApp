@@ -156,7 +156,7 @@ type Querier interface {
 	// 認証・セッション管理クエリ
 	// ==============================
 	// 従業員コードでログイン情報を取得
-	GetEmployeeForLogin(ctx context.Context, employeeCode *string) (GetEmployeeForLoginRow, error)
+	GetEmployeeForLogin(ctx context.Context, employeeCode string) (GetEmployeeForLoginRow, error)
 	// 健康診断
 	GetEmployeeHealthCheckupRecords(ctx context.Context, employeeID int32) ([]HealthCheckupRecord, error)
 	// 保険

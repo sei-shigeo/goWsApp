@@ -42,6 +42,10 @@ SELECT * FROM m_phones WHERE owner_id = $1 AND owner_type = 'employee';
 -- name: GetEmployeeBanks :many
 SELECT * FROM m_banks WHERE owner_id = $1 AND owner_type = 'employee';
 
+-- 緊急連絡先
+-- name: GetEmployeeEmergencyContacts :many
+SELECT * FROM emergency_contacts WHERE employee_id = $1;
+
 -- 教育訓練
 -- name: GetEmployeeTrainingRecords :many
 SELECT * FROM training_records WHERE employee_id = $1;

@@ -2,27 +2,29 @@ package pages
 
 import (
 	"github.com/sei-shigeo/webApp/db"
-	"github.com/sei-shigeo/webApp/helpers"
 	"github.com/sei-shigeo/webApp/views/components"
 	"github.com/sei-shigeo/webApp/views/layouts"
 )
 
+// EmployeesDetailsData は従業員の詳細ページに表示する全データを保持する構造体
 type EmployeesDetailsData struct {
-	BasicInfo            db.GetEmployeeBasicInfoRow
-	Banks                []db.MBank
-	Addresses            []db.MAddress
-	Emails               []db.MEmail
-	Phones               []db.MPhone
-	TrainingRecords      []db.TrainingRecord
-	HealthCheckupRecords []db.HealthCheckupRecord
-	QualificationRecords []db.QualificationRecord
-	InsuranceRecords     []db.InsuranceRecord
-	EducationRecords     []db.EducationRecord
-	CareerRecords        []db.CareerRecord
-	AccidentRecords      []db.AccidentRecord
-	ViolationRecords     []db.ViolationRecord
+	BasicInfo            db.GetEmployeeBasicInfoRow // 従業員の基本情報
+	Banks                []db.MBank                 // 銀行口座情報
+	Addresses            []db.MAddress              // 住所情報
+	Emails               []db.MEmail                // メールアドレス情報
+	Phones               []db.MPhone                // 電話番号情報
+	TrainingRecords      []db.TrainingRecord        // 教育訓練記録
+	HealthCheckupRecords []db.HealthCheckupRecord   // 健康診断記録
+	QualificationRecords []db.QualificationRecord   // 資格記録
+	InsuranceRecords     []db.InsuranceRecord       // 保険記録
+	EducationRecords     []db.EducationRecord       // 学歴記録
+	CareerRecords        []db.CareerRecord          // 職歴記録
+	AccidentRecords      []db.AccidentRecord        // 事故履歴記録
+	ViolationRecords     []db.ViolationRecord       // 違反履歴記録
+	EmergencyContacts    []db.EmergencyContact       // 緊急連絡先情報
 }
 
+// EmployeesDetails は従業員詳細ページのメインテンプレート
 templ (d EmployeesDetailsData) EmployeesDetails() {
 	@layouts.Base() {
 		@components.ContentHeaderSection(components.ContentHeaderProps{
@@ -42,294 +44,41 @@ templ (d EmployeesDetailsData) EmployeesDetails() {
 	}
 }
 
+// EmployeesDetailsFieldGroup は指定されたクラス名でフィールドグループを表示するテンプレート
+// fields: 表示するフィールドのスライス
+// className: 追加するCSSクラス名
+templ EmployeesDetailsFieldGroup(fields []fields, className string) {
+	if len(fields) > 0 {
+		<ul class={ "info-list", className }>
+			for _, field := range fields {
+				@field.EmployeesDetailsField()
+			}
+		</ul>
+	}
+}
+
+// EmployeesDetailsField は個別のフィールドを表示するテンプレート
+// ラベルに応じて特殊な表示（画像など）を行います
+templ (field fields) EmployeesDetailsField() {
+	<li>
+		<span>{ field.Label }</span>
+		switch field.Label {
+			case "従業員画像":
+				// 画像の場合は<img>タグで表示
+				<img class="sample-image" src={ field.Value } alt="従業員画像"/>
+			default:
+				// 通常のテキストとして表示
+				<span>{ field.Value }</span>
+		}
+	</li>
+}
+
+// EmployeesDetailsInfo は従業員の詳細情報全体を表示するテンプレート
+// fieldGroupTypesで定義された順序ですべての情報グループを表示します
 templ (d EmployeesDetailsData) EmployeesDetailsInfo() {
 	<div>
-		// 基本情報
-		<ul class="basic-info">
-			<li>
-				<span>従業員コード</span>
-				<span>{ d.BasicInfo.EmployeeCode }</span>
-			</li>
-			<li>
-				<span>従業員画像</span>
-				if d.BasicInfo.EmployeeImageUrl != nil {
-					<img src={ helpers.StringOf(d.BasicInfo.EmployeeImageUrl) } alt="従業員画像"/>
-				} else {
-					<div class="sample-image">
-						<img src="https://placehold.jp/150x150.png" alt="従業員画像"/>
-					</div>
-				}
-			</li>
-			<li>
-				<span>従業員写真日</span>
-				<span>{ helpers.DateOf(d.BasicInfo.EmployeePhotoDate) }</span>
-			</li>
-			<li>
-				<span>名前</span>
-				<span>{ d.BasicInfo.LastName } { d.BasicInfo.FirstName }</span>
-			</li>
-			<li>
-				<span>カナ</span>
-				<span>{ helpers.StringOf(d.BasicInfo.LastNameKana) } { helpers.StringOf(d.BasicInfo.FirstNameKana) }</span>
-			</li>
-			<li>
-				<span>正式名</span>
-				<span>{ helpers.StringOf(d.BasicInfo.LegalName) }</span>
-			</li>
-			<li>
-				<span>性別</span>
-				<span>
-					if d.BasicInfo.Gender == "男" || d.BasicInfo.Gender == "女" {
-						<span>{ d.BasicInfo.Gender }</span>
-					} else {
-						<span>-</span>
-					}
-				</span>
-			</li>
-			<li>
-				<span>生年月日</span>
-				<span>{ helpers.DateOf(d.BasicInfo.BirthDate) }</span>
-			</li>
-		</ul>
-		// メールアドレス
-		<ul class="email-info-list">
-			for i, email := range d.Emails {
-				<li>
-					<span>メールアドレス{ i + 1 }</span>
-					<span>{ email.Email }</span>
-				</li>
-			}
-		</ul>
-		// 電話番号
-		<ul class="phone-info">
-			for i, phone := range d.Phones {
-				<li>
-					<span>電話番号{ i + 1 }</span>
-					<span>{ phone.PhoneNumber }</span>
-				</li>
-			}
-		</ul>
-		// 住所
-		<ul class="address-info-list">
-			for i, address := range d.Addresses {
-				<li>
-					<span>住所{ i + 1 }</span>
-					<span>{ helpers.StringOf(address.PostalCode) } { helpers.StringOf(address.Prefecture) } { helpers.StringOf(address.City) } { helpers.StringOf(address.StreetAddress) } { helpers.StringOf(address.BuildingName) }</span>
-				</li>
-			}
-		</ul>
-		// 雇用情報
-		<ul class="employment-info-list">
-			<li>
-				<span>雇用日</span>
-				<span>{ helpers.DateOf(d.BasicInfo.HireDate) }</span>
-			</li>
-			<li>
-				<span>選任日</span>
-				<span>{ helpers.DateOf(d.BasicInfo.AppointmentDate) }</span>
-			</li>
-			<li>
-				<span>所属事業所</span>
-				<span>{ helpers.StringOf(d.BasicInfo.OfficeName) }</span>
-			</li>
-			<li>
-				<span>事業所種別</span>
-				<span>{ helpers.StringOf(d.BasicInfo.OfficeType) }</span>
-			</li>
-			<li>
-				<span>職種</span>
-				<span>{ helpers.StringOf(d.BasicInfo.JobType) }</span>
-			</li>
-			<li>
-				<span>雇用形態</span>
-				<span>{ helpers.StringOf(d.BasicInfo.EmploymentType) }</span>
-			</li>
-			<li>
-				<span>部署</span>
-				<span>{ helpers.StringOf(d.BasicInfo.Department) }</span>
-			</li>
-			<li>
-				<span>役職</span>
-				<span>{ helpers.StringOf(d.BasicInfo.Position) }</span>
-			</li>
-		</ul>
-		// 退職情報
-		<ul class="retirement-info-list">
-			<li>
-				<span>退職日</span>
-				<span>{ helpers.DateOf(d.BasicInfo.RetirementDate) }</span>
-			</li>
-			<li>
-				<span>退職理由</span>
-				<span>{ helpers.StringOf(d.BasicInfo.RetirementReason) }</span>
-			</li>
-			<li>
-				<span>死亡日</span>
-				<span>{ helpers.DateOf(d.BasicInfo.DeathDate) }</span>
-			</li>
-			<li>
-				<span>死亡理由</span>
-				<span>{ helpers.StringOf(d.BasicInfo.DeathReason) }</span>
-			</li>
-		</ul>
-		// 運転免許情報
-		<ul class="driver-license-info-list">
-			<li>
-				<span>運転免許番号</span>
-				<span>{ helpers.StringOf(d.BasicInfo.DriverLicenseNo) }</span>
-			</li>
-			<li>
-				<span>運転免許種別</span>
-				<span>{ helpers.StringOf(d.BasicInfo.DriverLicenseType) }</span>
-			</li>
-			<li>
-				<span>運転免許発行日</span>
-				<span>{ helpers.DateOf(d.BasicInfo.DriverLicenseIssueDate) }</span>
-			</li>
-			<li>
-				<span>運転免許有効期限</span>
-				<span>{ helpers.DateOf(d.BasicInfo.DriverLicenseExpiry) }</span>
-			</li>
-			<li>
-				<span>運転免許画像（前）</span>
-				<span>{ helpers.StringOf(d.BasicInfo.DriverLicenseImageUrlFront) }</span>
-			</li>
-			<li>
-				<span>運転免許画像（後）</span>
-				<span>{ helpers.StringOf(d.BasicInfo.DriverLicenseImageUrlBack) }</span>
-			</li>
-			<li>
-				<span>運転停止日</span>
-				<span>{ helpers.DateOf(d.BasicInfo.DrivingDisabledDate) }</span>
-			</li>
-			<li>
-				<span>運転停止理由</span>
-				<span>{ helpers.StringOf(d.BasicInfo.DrivingDisabledReason) }</span>
-			</li>
-		</ul>
-		// 在留資格
-		<ul class="visa-info-list">
-			<li>
-				<span>国籍</span>
-				<span>{ helpers.StringOf(d.BasicInfo.Nationality) }</span>
-			</li>
-			<li>
-				<span>在留資格</span>
-				<span>{ helpers.StringOf(d.BasicInfo.VisaType) }</span>
-			</li>
-			<li>
-				<span>在留期限</span>
-				<span>{ helpers.DateOf(d.BasicInfo.VisaExpiry) }</span>
-			</li>
-			<li>
-				<span>在留画像（前）</span>
-				<span>{ helpers.StringOf(d.BasicInfo.VisaImageUrlFront) }</span>
-			</li>
-			<li>
-				<span>在留画像（後）</span>
-				<span>{ helpers.StringOf(d.BasicInfo.VisaImageUrlBack) }</span>
-			</li>
-		</ul>
-		// 認証情報
-		<ul class="role-info-list">
-			<li>
-				<span>権限</span>
-				<span>{ helpers.StringOf(d.BasicInfo.RoleName) }</span>
-			</li>
-		</ul>
-		// ステータス
-		<ul class="status-info-list">
-			<li>
-				<span>ステータス</span>
-				if *d.BasicInfo.IsActive {
-					<span>有効</span>
-				} else {
-					<span>無効</span>
-				}
-			</li>
-		</ul>
-		// 銀行口座
-		<ul class="bank-info-list">
-			for i, bank := range d.Banks {
-				<li>
-					<span>銀行名{ i + 1 }</span>
-					<span>{ helpers.StringOf(bank.BankName) } { helpers.StringOf(bank.BranchName) }</span>
-				</li>
-			}
-		</ul>
-		// 教育訓練
-		<ul class="training-info-list">
-			for i, training := range d.TrainingRecords {
-				<li>
-					<span>教育訓練{ i + 1 }</span>
-					<span>{ training.TrainingType }</span>
-				</li>
-			}
-		</ul>
-		// 健康診断
-		<ul class="health-checkup-info-list">
-			for i, healthCheckup := range d.HealthCheckupRecords {
-				<li>
-					<span>健康診断{ i + 1 }</span>
-					<span>{ helpers.StringOf(healthCheckup.CheckupType) }</span>
-				</li>
-			}
-		</ul>
-		// 資格
-		<ul class="qualification-info-list">
-			for i, qualification := range d.QualificationRecords {
-				<li>
-					<span>資格{ i + 1 }</span>
-					<span>{ helpers.StringOf(qualification.QualificationType) }</span>
-				</li>
-			}
-		</ul>
-		// 保険
-		<ul class="insurance-info-list">
-			for i, insurance := range d.InsuranceRecords {
-				<li>
-					<span>保険{ i + 1 }</span>
-					<span>{ helpers.StringOf(insurance.InsuranceType) } { helpers.DateOf(insurance.InsuranceDate) } { helpers.StringOf(insurance.InsuranceNumber) }</span>
-				</li>
-			}
-		</ul>
-		// 学歴
-		<ul class="education-info-list">
-			for i, education := range d.EducationRecords {
-				<li>
-					<span>学歴{ i + 1 }</span>
-					<span>{ helpers.StringOf(education.EducationType) } { helpers.DateOf(education.EducationDate) } { helpers.StringOf(education.EducationInstitution) } { helpers.StringOf(education.Notes) }</span>
-				</li>
-			}
-		</ul>
-		// 職歴
-		<ul class="career-info-list">
-			for i, career := range d.CareerRecords {
-				<li>
-					<span>職歴{ i + 1 }</span>
-					<span>{ helpers.StringOf(career.CompanyName) } { helpers.StringOf(career.JobType) }</span>
-					<span>{ helpers.DateOf(career.StartDate) } { helpers.DateOf(career.EndDate) }</span>
-					<span>{ helpers.StringOf(career.RetirementReason) }</span>
-				</li>
-			}
-		</ul>
-		// 事故履歴
-		<ul class="accident-info-list">
-			for i, accident := range d.AccidentRecords {
-				<li>
-					<span>事故履歴{ i + 1 }</span>
-					<span>{ helpers.StringOf(accident.AccidentType) }</span>
-				</li>
-			}
-		</ul>
-		// 違反履歴
-		<ul class="violation-info-list">
-			for i, violation := range d.ViolationRecords {
-				<li>
-					<span>違反履歴{ i + 1 }</span>
-					<span>{ helpers.StringOf(violation.ViolationType) }</span>
-				</li>
-			}
-		</ul>
+		for _, fieldGroupType := range fieldGroupTypes {
+			@EmployeesDetailsFieldGroup(d.EmployeesDetailsFieldsData(fieldGroupType), fieldGroupType+"-info")
+		}
 	</div>
 }

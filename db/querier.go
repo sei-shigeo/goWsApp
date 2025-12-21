@@ -152,6 +152,8 @@ type Querier interface {
 	GetEmployeeEducationRecords(ctx context.Context, employeeID int32) ([]EducationRecord, error)
 	// メールアドレス
 	GetEmployeeEmails(ctx context.Context, ownerID int32) ([]MEmail, error)
+	// 緊急連絡先
+	GetEmployeeEmergencyContacts(ctx context.Context, employeeID int32) ([]EmergencyContact, error)
 	// ==============================
 	// 認証・セッション管理クエリ
 	// ==============================

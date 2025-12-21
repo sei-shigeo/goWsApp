@@ -71,6 +71,13 @@ func EmployeesBasicInfoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// 緊急連絡先を取得
+	emergencyContacts, err := queries.GetEmployeeEmergencyContacts(r.Context(), int32(idInt))
+	if err != nil {
+		http.Error(w, "Failed to get employee emergency contacts", http.StatusInternalServerError)
+		return
+	}
+
 	// 教育訓練を取得
 	trainingRecords, err := queries.GetEmployeeTrainingRecords(r.Context(), int32(idInt))
 	if err != nil {
@@ -141,6 +148,7 @@ func EmployeesBasicInfoHandler(w http.ResponseWriter, r *http.Request) {
 		CareerRecords:        careerRecords,
 		AccidentRecords:      accidentRecords,
 		ViolationRecords:     violationRecords,
+		EmergencyContacts:    emergencyContacts,
 	}
 
 	data.EmployeesDetails().Render(r.Context(), w)

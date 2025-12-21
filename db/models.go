@@ -221,6 +221,16 @@ type EducationRecord struct {
 	UpdatedAt            pgtype.Timestamptz `json:"updated_at"`
 }
 
+type EmergencyContact struct {
+	ID                  int32              `json:"id"`
+	EmployeeID          int32              `json:"employee_id"`
+	ContactName         *string            `json:"contact_name"`
+	ContactRelationship *string            `json:"contact_relationship"`
+	ContactPhone        *string            `json:"contact_phone"`
+	CreatedAt           pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt           pgtype.Timestamptz `json:"updated_at"`
+}
+
 type Employee struct {
 	ID                         int32              `json:"id"`
 	EmployeeCode               string             `json:"employee_code"`

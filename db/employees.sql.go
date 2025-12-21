@@ -404,6 +404,39 @@ func (q *Queries) GetEmployeeEmails(ctx context.Context, ownerID int32) ([]MEmai
 	return items, nil
 }
 
+const getEmployeeEmergencyContacts = `-- name: GetEmployeeEmergencyContacts :many
+SELECT id, employee_id, contact_name, contact_relationship, contact_phone, created_at, updated_at FROM emergency_contacts WHERE employee_id = $1
+`
+
+// 緊急連絡先
+func (q *Queries) GetEmployeeEmergencyContacts(ctx context.Context, employeeID int32) ([]EmergencyContact, error) {
+	rows, err := q.db.Query(ctx, getEmployeeEmergencyContacts, employeeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []EmergencyContact{}
+	for rows.Next() {
+		var i EmergencyContact
+		if err := rows.Scan(
+			&i.ID,
+			&i.EmployeeID,
+			&i.ContactName,
+			&i.ContactRelationship,
+			&i.ContactPhone,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getEmployeeHealthCheckupRecords = `-- name: GetEmployeeHealthCheckupRecords :many
 SELECT id, employee_id, checkup_date, checkup_type, overall_result, medical_institution, notes, created_at, updated_at FROM health_checkup_records WHERE employee_id = $1
 `

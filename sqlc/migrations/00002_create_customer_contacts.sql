@@ -44,7 +44,11 @@ CREATE INDEX idx_customer_contacts_code ON customer_contacts(contact_code);
 CREATE INDEX idx_customer_contacts_primary ON customer_contacts(is_primary) WHERE is_primary = true;
 CREATE INDEX idx_customer_contacts_active ON customer_contacts(is_active);
 
-INSERT INTO customer_contacts (customer_id, contact_code, last_name, first_name, last_name_kana, first_name_kana, department, position, office_location, email, phone_direct, phone_mobile, is_primary) VALUES 
+INSERT INTO customer_contacts (
+    customer_id, contact_code, 
+    last_name, first_name, last_name_kana, first_name_kana, 
+    department, position, 
+    office_location, email, phone_direct, phone_mobile, is_primary) VALUES 
     (1, 'CC-001', '山田', '太郎', 'ヤマダ', 'タロウ', '購買部', '部長', '本社', 'yamada@tsuzuki.co.jp', '03-1234-5678', '090-1234-5678', true),
     (1, 'CC-002', '佐藤', '花子', 'サトウ', 'ハナコ', '購買部', '課長', '本社', 'sato@tsuzuki.co.jp', '03-1234-5679', '090-1234-5679', false),
     (2, 'CC-003', '鈴木', '一郎', 'スズキ', 'イチロウ', '物流部', '部長', '本社', 'suzuki@mps.co.jp', '03-2234-5678', '090-2234-5678', true);

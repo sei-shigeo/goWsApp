@@ -237,9 +237,6 @@ body {
 /* MainContent */
 .mainContentLayout {
   flex: 1;
-}
-
-.mainContentLayout {
   display: grid;
   grid-template-rows: 52px auto 1fr;
   & > .header {
@@ -258,6 +255,7 @@ body {
   }
   & > .content {
     padding-inline: var(--spacing-sm);
+    overflow-y: auto;
   }
 }
 

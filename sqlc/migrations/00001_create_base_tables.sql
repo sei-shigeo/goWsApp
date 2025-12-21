@@ -92,8 +92,8 @@ CREATE TABLE IF NOT EXISTS company_offices (
     id SERIAL PRIMARY KEY,
     company_id INTEGER NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
     office_code VARCHAR(50) UNIQUE,
-    office_name VARCHAR(255) NOT NULL,
-    office_type VARCHAR(20) CHECK (office_type IN ('本社', '支店', '事業所', '車庫', '倉庫', 'その他')),
+    office_name VARCHAR(255) NOT NULL, -- 事業所名
+    office_type VARCHAR(20) CHECK (office_type IN ('本社', '支店', '事業所', '車庫', '倉庫', 'その他')), -- 事業所種別
     manager_id INTEGER, -- employeesテーブル作成後に外部キー制約を追加
     
     -- 基本情報
@@ -101,12 +101,12 @@ CREATE TABLE IF NOT EXISTS company_offices (
     closing_date DATE,
     
     -- 連絡先情報
-    postal_code VARCHAR(10),
-    address VARCHAR(500),
-    phone VARCHAR(20),
-    fax VARCHAR(20),
-    email VARCHAR(255),
-    website VARCHAR(255),
+    postal_code VARCHAR(10), -- 郵便番号
+    address VARCHAR(500), -- 住所
+    phone VARCHAR(20), -- 電話番号
+    fax VARCHAR(20), -- ファックス
+    email VARCHAR(255), -- メールアドレス
+    website VARCHAR(255), -- ウェブサイト
     
     -- その他
     image_url VARCHAR(255),
@@ -124,8 +124,8 @@ CREATE INDEX idx_company_offices_active ON company_offices(is_active);
 
 -- 事業所データを先に挿入（manager_idはNULL）
 INSERT INTO company_offices (company_id, office_code, office_name, office_type, address, phone, email, website) VALUES 
-    (1, 'O-001', '本社', '本社', '愛知県名古屋市中区栄3-4-5', '052-1234-5678', 'info@wasei.co.jp', 'https://www.wasei.co.jp'),
-    (1, 'O-002', '東京支店', '支店', '東京都千代田区永田町1-7-1', '03-1234-5678', 'tokyo@wasei.co.jp', 'https://www.wasei.co.jp');
+    (1, 'O-001', '株式会社和清商事', '本社', '愛知県名古屋市中区栄3-4-5', '052-1234-5678', 'info@wasei.co.jp', 'https://www.wasei.co.jp'),
+    (1, 'O-002', '豊田', '支店', '東京都千代田区永田町1-7-1', '03-1234-5678', 'tokyo@wasei.co.jp', 'https://www.wasei.co.jp');
 
 -- 従業員テーブル
 CREATE TABLE IF NOT EXISTS employees (
@@ -201,7 +201,7 @@ INSERT INTO employees (
     last_name, first_name, last_name_kana, first_name_kana, legal_name, 
     gender, birth_date, 
     hire_date, office_id, role_id, password_hash) VALUES 
-    ('E-001', '茂雄', '清', 'シゲオ', 'セイ', 'Rafael Shigueo Sei', '男', CURRENT_DATE, CURRENT_DATE, 1, 1, '$2a$10$dummy_hash_for_admin'),
+    ('E-001', '茂雄', '清', 'シゲオ', 'セイ', 'Rafael Shigueo Sei', '男', CURRENT_DATE, CURRENT_DATE, 2, 1, '$2a$10$dummy_hash_for_admin'),
     ('E-002', 'アケミ', '伴', 'アケミ', 'バン', 'Akemi Ban', '女', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
     ('E-003', 'マサヒロ', '藤原', 'マサヒロ', 'フジワラ', 'Masahiro Fujiwara', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
     ('E-004', 'ヒロシ', '田中', 'ヒロシ', 'タナカ', 'Hiroshi Tanaka', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),

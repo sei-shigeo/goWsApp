@@ -5,25 +5,42 @@
 -- 従業員関連テーブル
 -- ==============================
 
--- 教育訓練履歴テーブル
-CREATE TABLE IF NOT EXISTS training_records (
+-- 緊急連絡先
+CREATE TABLE IF NOT EXISTS emergency_contacts (
     id SERIAL PRIMARY KEY,
     employee_id INTEGER NOT NULL REFERENCES employees(id) ON DELETE CASCADE,
-    training_type VARCHAR(50) NOT NULL CHECK (training_type IN ('initial', 'regular', 'accident', 'special')),
-    training_date DATE NOT NULL,
-    training_hours DECIMAL(4,1),
-    instructor VARCHAR(100),
-    notes TEXT,
+    contact_name VARCHAR(100),
+    contact_relationship VARCHAR(50),
+    contact_phone VARCHAR(20),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_training_records_employee ON training_records(employee_id);
-CREATE INDEX idx_training_records_date ON training_records(training_date);
+CREATE INDEX idx_emergency_contacts_employee ON emergency_contacts(employee_id);
+
+INSERT INTO emergency_contacts (employee_id, contact_name, contact_relationship, contact_phone) VALUES 
+    (1, '山田太郎', '父', '090-1234-5678'),
+    (1, '山田花子', '母', '090-1234-5679'),
+    (2, '佐藤一郎', '父', '090-1234-5680');
+
+-- 教育訓練履歴テーブル
+CREATE TABLE IF NOT EXISTS training_records (
+    id SERIAL PRIMARY KEY,
+    employee_id INTEGER NOT NULL REFERENCES employees(id) ON DELETE CASCADE,
+    training_type VARCHAR(50) NOT NULL CHECK (training_type IN ('初任教育', '定期講習', '事故教育', '特殊教育')), -- 初任教育、定期講習、事故教育、特殊教育は教育訓練の種類
+    training_date DATE NOT NULL, -- 教育訓練日
+    training_hours DECIMAL(4,1), -- 教育訓練時間 
+    instructor VARCHAR(100), -- 指導員
+    notes TEXT, -- 備考
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+); -- 教育訓練履歴テーブル
 
 INSERT INTO training_records (employee_id, training_type, training_date, training_hours, instructor, notes) VALUES 
-    (1, 'initial', '2025-01-15', 8.0, '山田講師', '初任教育を実施'),
-    (2, 'regular', '2025-02-01', 2.0, '佐藤指導員', '定期講習を実施');
+    (1, '初任教育', '2025-01-15', 8.0, '山田講師', '初任教育を実施'),
+    (1, '定期講習', '2026-01-15', 8.0, '山田講師', '安全教育を実施'),
+    (1, '事故教育', '2027-01-15', 8.0, '山田講師', '消防教育を実施'),
+    (2, '特殊教育', '2025-02-01', 2.0, '佐藤指導員', '特殊教育を実施');
 
 -- 健康診断履歴テーブル
 CREATE TABLE IF NOT EXISTS health_checkup_records (
@@ -43,7 +60,11 @@ CREATE INDEX idx_health_checkup_records_date ON health_checkup_records(checkup_d
 
 INSERT INTO health_checkup_records (employee_id, checkup_date, checkup_type, overall_result, medical_institution, notes) VALUES 
     (1, '2025-04-01', '定期', '異常なし', 'さくら健康診断センター', '特記事項なし'),
-    (2, '2025-04-01', '定期', '要再検査', '名古屋中央クリニック', '血圧高め、再検査要');
+    (1, '2026-07-01', '定期', '異常なし', 'さくら健康診断センター', '特記事項なし'),
+    (1, '2027-10-01', '定期', '異常なし', 'さくら健康診断センター', '特記事項なし'),
+    (2, '2026-04-01', '定期', '要再検査', '名古屋中央クリニック', '血圧高め、再検査要'),
+    (2, '2026-07-01', '定期', '要再検査', '名古屋中央クリニック', '血圧高め、再検査要'),
+    (2, '2026-10-01', '定期', '要再検査', '名古屋中央クリニック', '血圧高め、再検査要');
 
 -- 資格取得履歴テーブル
 CREATE TABLE IF NOT EXISTS qualification_records (
@@ -166,6 +187,7 @@ CREATE INDEX idx_violation_records_date ON violation_records(violation_date);
 -- +goose Down
 -- +goose StatementBegin
 
+DROP TABLE IF EXISTS emergency_contacts CASCADE;
 DROP TABLE IF EXISTS violation_records CASCADE;
 DROP TABLE IF EXISTS accident_records CASCADE;
 DROP TABLE IF EXISTS career_records CASCADE;

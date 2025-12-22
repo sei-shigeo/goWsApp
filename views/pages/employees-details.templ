@@ -1,6 +1,7 @@
 package pages
 
 import (
+	"fmt"
 	"github.com/sei-shigeo/webApp/db"
 	"github.com/sei-shigeo/webApp/views/components"
 	"github.com/sei-shigeo/webApp/views/layouts"
@@ -21,7 +22,7 @@ type EmployeesDetailsData struct {
 	CareerRecords        []db.CareerRecord          // 職歴記録
 	AccidentRecords      []db.AccidentRecord        // 事故履歴記録
 	ViolationRecords     []db.ViolationRecord       // 違反履歴記録
-	EmergencyContacts    []db.EmergencyContact       // 緊急連絡先情報
+	EmergencyContacts    []db.EmergencyContact      // 緊急連絡先情報
 }
 
 // EmployeesDetails は従業員詳細ページのメインテンプレート
@@ -38,7 +39,7 @@ templ (d EmployeesDetailsData) EmployeesDetails() {
 				OnClick: "@get('/employees')",
 			})
 		</div>
-		<div class="content">
+		<div class="content employ">
 			@d.EmployeesDetailsInfo()
 		</div>
 	}
@@ -47,9 +48,9 @@ templ (d EmployeesDetailsData) EmployeesDetails() {
 // EmployeesDetailsFieldGroup は指定されたクラス名でフィールドグループを表示するテンプレート
 // fields: 表示するフィールドのスライス
 // className: 追加するCSSクラス名
-templ EmployeesDetailsFieldGroup(fields []fields, className string) {
+templ EmployeesDetailsFieldGroup(fields []fields, className string, gridArea string) {
 	if len(fields) > 0 {
-		<ul class={ "info-list", className }>
+		<ul class={ "info-list", className } style={ fmt.Sprintf("grid-area: %s;", gridArea) }>
 			for _, field := range fields {
 				@field.EmployeesDetailsField()
 			}
@@ -76,9 +77,9 @@ templ (field fields) EmployeesDetailsField() {
 // EmployeesDetailsInfo は従業員の詳細情報全体を表示するテンプレート
 // fieldGroupTypesで定義された順序ですべての情報グループを表示します
 templ (d EmployeesDetailsData) EmployeesDetailsInfo() {
-	<div>
+	<div class="employee-details">
 		for _, fieldGroupType := range fieldGroupTypes {
-			@EmployeesDetailsFieldGroup(d.EmployeesDetailsFieldsData(fieldGroupType), fieldGroupType+"-info")
+			@EmployeesDetailsFieldGroup(d.EmployeesDetailsFieldsData(fieldGroupType), fieldGroupType+"-info", fieldGroupType)
 		}
 	</div>
 }

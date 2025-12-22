@@ -408,3 +408,24 @@ body {
     }
   }
 }
+
+/* Employee Details Components */
+.employee-details {
+  display: grid;
+  grid-template-areas:
+    "role role"
+    "basic basic"
+    "email email"
+    "phone phone"
+    "address address"
+    "emergency-contact emergency-contact"
+    "employment retirement"
+    "driver-license driver-license"
+    "visa visa"
+    "status bank"
+    "training health-checkup"
+    "qualification insurance"
+    "education career"
+    "accident violation";
+  gap: var(--spacing-sm);
+}

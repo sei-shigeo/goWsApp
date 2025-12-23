@@ -45,86 +45,9 @@ func (q *Queries) GetEmployeeAccidentRecords(ctx context.Context, employeeID int
 	return items, nil
 }
 
-const getEmployeeAddresses = `-- name: GetEmployeeAddresses :many
-SELECT id, owner_type, owner_id, postal_code, prefecture, city, street_address, building_name, is_primary, created_at, updated_at FROM m_addresses WHERE owner_id = $1 AND owner_type = 'employee'
-`
-
-// 住所
-func (q *Queries) GetEmployeeAddresses(ctx context.Context, ownerID int32) ([]MAddress, error) {
-	rows, err := q.db.Query(ctx, getEmployeeAddresses, ownerID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []MAddress{}
-	for rows.Next() {
-		var i MAddress
-		if err := rows.Scan(
-			&i.ID,
-			&i.OwnerType,
-			&i.OwnerID,
-			&i.PostalCode,
-			&i.Prefecture,
-			&i.City,
-			&i.StreetAddress,
-			&i.BuildingName,
-			&i.IsPrimary,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getEmployeeBanks = `-- name: GetEmployeeBanks :many
-SELECT id, owner_type, owner_id, bank_code, bank_name, branch_code, branch_name, account_type, account_number, account_name, account_kana, is_active, created_at, updated_at FROM m_banks WHERE owner_id = $1 AND owner_type = 'employee'
-`
-
-// 銀行
-func (q *Queries) GetEmployeeBanks(ctx context.Context, ownerID int32) ([]MBank, error) {
-	rows, err := q.db.Query(ctx, getEmployeeBanks, ownerID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []MBank{}
-	for rows.Next() {
-		var i MBank
-		if err := rows.Scan(
-			&i.ID,
-			&i.OwnerType,
-			&i.OwnerID,
-			&i.BankCode,
-			&i.BankName,
-			&i.BranchCode,
-			&i.BranchName,
-			&i.AccountType,
-			&i.AccountNumber,
-			&i.AccountName,
-			&i.AccountKana,
-			&i.IsActive,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const getEmployeeBasicInfo = `-- name: GetEmployeeBasicInfo :one
 SELECT 
-e.id, e.employee_code, e.employee_image_url, e.employee_photo_date, e.last_name, e.first_name, e.last_name_kana, e.first_name_kana, e.legal_name, e.gender, e.birth_date, e.hire_date, e.appointment_date, e.office_id, e.job_type, e.employment_type, e.department, e.position, e.retirement_date, e.retirement_reason, e.death_date, e.death_reason, e.driver_license_no, e.driver_license_type, e.driver_license_issue_date, e.driver_license_expiry, e.driver_license_image_url_front, e.driver_license_image_url_back, e.driving_disabled_date, e.driving_disabled_reason, e.nationality, e.visa_type, e.visa_expiry, e.visa_image_url_front, e.visa_image_url_back, e.role_id, e.password_hash, e.password_updated_at, e.failed_login_attempts, e.locked_until, e.last_login_at, e.is_active, e.created_at, e.updated_at, e.deleted_at, 
+e.id, e.employee_code, e.employee_image_url, e.employee_photo_date, e.last_name, e.first_name, e.last_name_kana, e.first_name_kana, e.legal_name, e.gender, e.blood_type, e.address, e.phone, e.email, e.birth_date, e.hire_date, e.appointment_date, e.office_id, e.job_type, e.employment_type, e.department, e.position, e.retirement_date, e.retirement_reason, e.death_date, e.death_reason, e.driver_license_no, e.driver_license_type, e.driver_license_issue_date, e.driver_license_expiry, e.driver_license_image_url_front, e.driver_license_image_url_back, e.driving_disabled_date, e.driving_disabled_reason, e.nationality, e.visa_type, e.visa_expiry, e.visa_image_url_front, e.visa_image_url_back, e.bank_code, e.bank_name, e.bank_branch_code, e.bank_branch_name, e.bank_account_type, e.bank_account_number, e.bank_account_name, e.bank_account_kana, e.role_id, e.password_hash, e.password_updated_at, e.failed_login_attempts, e.locked_until, e.last_login_at, e.is_active, e.created_at, e.updated_at, e.deleted_at, 
 co.office_name, 
 co.office_type,
 r.name as role_name
@@ -145,6 +68,10 @@ type GetEmployeeBasicInfoRow struct {
 	FirstNameKana              *string            `json:"first_name_kana"`
 	LegalName                  *string            `json:"legal_name"`
 	Gender                     string             `json:"gender"`
+	BloodType                  string             `json:"blood_type"`
+	Address                    *string            `json:"address"`
+	Phone                      *string            `json:"phone"`
+	Email                      *string            `json:"email"`
 	BirthDate                  pgtype.Date        `json:"birth_date"`
 	HireDate                   pgtype.Date        `json:"hire_date"`
 	AppointmentDate            pgtype.Date        `json:"appointment_date"`
@@ -165,18 +92,26 @@ type GetEmployeeBasicInfoRow struct {
 	DriverLicenseImageUrlBack  *string            `json:"driver_license_image_url_back"`
 	DrivingDisabledDate        pgtype.Date        `json:"driving_disabled_date"`
 	DrivingDisabledReason      *string            `json:"driving_disabled_reason"`
-	Nationality                *string            `json:"nationality"`
+	Nationality                string             `json:"nationality"`
 	VisaType                   *string            `json:"visa_type"`
 	VisaExpiry                 pgtype.Date        `json:"visa_expiry"`
 	VisaImageUrlFront          *string            `json:"visa_image_url_front"`
 	VisaImageUrlBack           *string            `json:"visa_image_url_back"`
+	BankCode                   *string            `json:"bank_code"`
+	BankName                   *string            `json:"bank_name"`
+	BankBranchCode             *string            `json:"bank_branch_code"`
+	BankBranchName             *string            `json:"bank_branch_name"`
+	BankAccountType            *string            `json:"bank_account_type"`
+	BankAccountNumber          *string            `json:"bank_account_number"`
+	BankAccountName            *string            `json:"bank_account_name"`
+	BankAccountKana            *string            `json:"bank_account_kana"`
 	RoleID                     *int32             `json:"role_id"`
 	PasswordHash               *string            `json:"password_hash"`
 	PasswordUpdatedAt          pgtype.Timestamptz `json:"password_updated_at"`
 	FailedLoginAttempts        *int32             `json:"failed_login_attempts"`
 	LockedUntil                pgtype.Timestamptz `json:"locked_until"`
 	LastLoginAt                pgtype.Timestamptz `json:"last_login_at"`
-	IsActive                   *bool              `json:"is_active"`
+	IsActive                   bool               `json:"is_active"`
 	CreatedAt                  pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt                  pgtype.Timestamptz `json:"updated_at"`
 	DeletedAt                  pgtype.Timestamptz `json:"deleted_at"`
@@ -200,6 +135,10 @@ func (q *Queries) GetEmployeeBasicInfo(ctx context.Context, id int32) (GetEmploy
 		&i.FirstNameKana,
 		&i.LegalName,
 		&i.Gender,
+		&i.BloodType,
+		&i.Address,
+		&i.Phone,
+		&i.Email,
 		&i.BirthDate,
 		&i.HireDate,
 		&i.AppointmentDate,
@@ -225,6 +164,14 @@ func (q *Queries) GetEmployeeBasicInfo(ctx context.Context, id int32) (GetEmploy
 		&i.VisaExpiry,
 		&i.VisaImageUrlFront,
 		&i.VisaImageUrlBack,
+		&i.BankCode,
+		&i.BankName,
+		&i.BankBranchCode,
+		&i.BankBranchName,
+		&i.BankAccountType,
+		&i.BankAccountNumber,
+		&i.BankAccountName,
+		&i.BankAccountKana,
 		&i.RoleID,
 		&i.PasswordHash,
 		&i.PasswordUpdatedAt,
@@ -244,18 +191,16 @@ func (q *Queries) GetEmployeeBasicInfo(ctx context.Context, id int32) (GetEmploy
 
 const getEmployeeCardList = `-- name: GetEmployeeCardList :many
 SELECT 
-    e.id, 
-    e.employee_code, 
-    e.employee_image_url, 
-    e.last_name, 
-    e.first_name,
-    m.email,
-    p.phone_number
-FROM employees e
-LEFT JOIN m_emails m ON e.id = m.owner_id AND m.owner_type = 'employee' AND m.is_primary = true
-LEFT JOIN m_phones p ON e.id = p.owner_id AND p.owner_type = 'employee' AND p.is_primary = true
-WHERE e.deleted_at IS NULL
-ORDER BY e.employee_code
+    id, 
+    employee_code, 
+    employee_image_url, 
+    last_name, 
+    first_name,
+    email,
+    phone
+FROM employees
+WHERE deleted_at IS NULL
+ORDER BY employee_code
 LIMIT $1 OFFSET $2
 `
 
@@ -271,7 +216,7 @@ type GetEmployeeCardListRow struct {
 	LastName         string  `json:"last_name"`
 	FirstName        string  `json:"first_name"`
 	Email            *string `json:"email"`
-	PhoneNumber      *string `json:"phone_number"`
+	Phone            *string `json:"phone"`
 }
 
 func (q *Queries) GetEmployeeCardList(ctx context.Context, arg GetEmployeeCardListParams) ([]GetEmployeeCardListRow, error) {
@@ -290,7 +235,7 @@ func (q *Queries) GetEmployeeCardList(ctx context.Context, arg GetEmployeeCardLi
 			&i.LastName,
 			&i.FirstName,
 			&i.Email,
-			&i.PhoneNumber,
+			&i.Phone,
 		); err != nil {
 			return nil, err
 		}
@@ -358,39 +303,6 @@ func (q *Queries) GetEmployeeEducationRecords(ctx context.Context, employeeID in
 			&i.EducationDate,
 			&i.EducationInstitution,
 			&i.Notes,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getEmployeeEmails = `-- name: GetEmployeeEmails :many
-SELECT id, owner_type, owner_id, email, is_primary, created_at, updated_at FROM m_emails WHERE owner_id = $1 AND owner_type = 'employee'
-`
-
-// メールアドレス
-func (q *Queries) GetEmployeeEmails(ctx context.Context, ownerID int32) ([]MEmail, error) {
-	rows, err := q.db.Query(ctx, getEmployeeEmails, ownerID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []MEmail{}
-	for rows.Next() {
-		var i MEmail
-		if err := rows.Scan(
-			&i.ID,
-			&i.OwnerType,
-			&i.OwnerID,
-			&i.Email,
-			&i.IsPrimary,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -493,40 +405,6 @@ func (q *Queries) GetEmployeeInsuranceRecords(ctx context.Context, employeeID in
 			&i.InsuranceDate,
 			&i.InsuranceNumber,
 			&i.InsuranceImageUrl,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getEmployeePhones = `-- name: GetEmployeePhones :many
-SELECT id, owner_type, owner_id, phone_number, phone_type, is_primary, created_at, updated_at FROM m_phones WHERE owner_id = $1 AND owner_type = 'employee'
-`
-
-// 電話番号
-func (q *Queries) GetEmployeePhones(ctx context.Context, ownerID int32) ([]MPhone, error) {
-	rows, err := q.db.Query(ctx, getEmployeePhones, ownerID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []MPhone{}
-	for rows.Next() {
-		var i MPhone
-		if err := rows.Scan(
-			&i.ID,
-			&i.OwnerType,
-			&i.OwnerID,
-			&i.PhoneNumber,
-			&i.PhoneType,
-			&i.IsPrimary,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {

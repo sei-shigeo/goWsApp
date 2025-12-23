@@ -3,6 +3,7 @@ package pages
 import (
 	"fmt"
 	"github.com/sei-shigeo/webApp/db"
+	"github.com/sei-shigeo/webApp/helpers"
 	"github.com/sei-shigeo/webApp/views/components"
 	"github.com/sei-shigeo/webApp/views/layouts"
 )
@@ -10,10 +11,6 @@ import (
 // EmployeesDetailsData は従業員の詳細ページに表示する全データを保持する構造体
 type EmployeesDetailsData struct {
 	BasicInfo            db.GetEmployeeBasicInfoRow // 従業員の基本情報
-	Banks                []db.MBank                 // 銀行口座情報
-	Addresses            []db.MAddress              // 住所情報
-	Emails               []db.MEmail                // メールアドレス情報
-	Phones               []db.MPhone                // 電話番号情報
 	TrainingRecords      []db.TrainingRecord        // 教育訓練記録
 	HealthCheckupRecords []db.HealthCheckupRecord   // 健康診断記録
 	QualificationRecords []db.QualificationRecord   // 資格記録
@@ -32,54 +29,214 @@ templ (d EmployeesDetailsData) EmployeesDetails() {
 			Title:  "従業員詳細",
 			Search: true,
 		})
-		<div class="actions-container">
+		<div class="actions-container details">
+			@components.Button(components.ButtonProps{
+				Icon:    "print",
+				Label:   "'印刷'",
+				OnClick: "window.print()",
+			})
+			@components.Button(components.ButtonProps{
+				Icon:    "edit",
+				Label:   "$isEdit ? '編集' : '保存'",
+				OnClick: "$isEdit = !$isEdit",
+			})
 			@components.Button(components.ButtonProps{
 				Icon:    "arrow_back",
-				Label:   "戻る",
+				Label:   "'戻る'",
 				OnClick: "@get('/employees')",
 			})
 		</div>
-		<div class="content employ">
-			@d.EmployeesDetailsInfo()
+		<div class="content employee-details">
+			@d.SelectedSection()
+			@d.EmployeeBasicSection()
 		</div>
 	}
 }
 
-// EmployeesDetailsFieldGroup は指定されたクラス名でフィールドグループを表示するテンプレート
-// fields: 表示するフィールドのスライス
-// className: 追加するCSSクラス名
-templ EmployeesDetailsFieldGroup(fields []fields, className string, gridArea string) {
-	if len(fields) > 0 {
-		<ul class={ "info-list", className } style={ fmt.Sprintf("grid-area: %s;", gridArea) }>
-			for _, field := range fields {
-				@field.EmployeesDetailsField()
-			}
-		</ul>
+templ (d EmployeesDetailsData) SelectedSection() {
+	<select name="selected-section" id="selected-section" class="selected-section">
+		<option value="basic">基本情報</option>
+		<option value="employment">雇用&退職</option>
+		<option value="license">免許&資格</option>
+		<option value="education">学歴&職歴</option>
+		<option value="insurance">保険書&健康診断</option>
+	</select>
+}
+
+func isActive(isActive bool) string {
+	if isActive {
+		return "在職中"
+	} else {
+		return "退職中"
 	}
 }
 
-// EmployeesDetailsField は個別のフィールドを表示するテンプレート
-// ラベルに応じて特殊な表示（画像など）を行います
-templ (field fields) EmployeesDetailsField() {
-	<li>
-		<span>{ field.Label }</span>
-		switch field.Label {
-			case "従業員画像":
-				// 画像の場合は<img>タグで表示
-				<img class="sample-image" src={ field.Value } alt="従業員画像"/>
-			default:
-				// 通常のテキストとして表示
-				<span>{ field.Value }</span>
-		}
-	</li>
+// EmployeesDetailsInfo は従業員の詳細情報全体を表示するテンプレート
+templ (d EmployeesDetailsData) EmployeeBasicSection() {
+	<section class="section base" data-signals="{ isEdit: true }">
+		<div class="fields image" style="grid-area: A;">
+			<div class="item employee-image" style="grid-area: img;">
+				<img
+					src={ helpers.ImageUrlOf(d.BasicInfo.EmployeeImageUrl) }
+					alt="従業員画像"
+					height="150"
+					width="150"
+					class="image"
+				/>
+			</div>
+		</div>
+		<div class="fields header" style="grid-area: B;">
+			<div class="item employee-code" style="grid-area: code;">
+				<label class="label" for="employee-code">従業員番号</label>
+				<input type="text" class="value" id="employee-code" value={ d.BasicInfo.EmployeeCode } data-attr:disabled="$isEdit"/>
+			</div>
+			<div class="item nationality" style="grid-area: nationality;">
+				<label class="label" for="nationality">国籍</label>
+				<select name="nationality" id="nationality" data-attr:disabled="$isEdit">
+					<option value={ d.BasicInfo.Nationality }>{ d.BasicInfo.Nationality }</option>
+					<option value="ブラジル">ブラジル</option>
+					<option value="ペルー">ペルー</option>
+				</select>
+			</div>
+			<div class="item status" style="grid-area: status;">
+				<label class="label" for="status">ステータス</label>
+				<select name="status" id="status" data-attr:disabled="$isEdit">
+					<option value={ isActive(d.BasicInfo.IsActive) }>{ isActive(d.BasicInfo.IsActive) }</option>
+					<option value="退職中">退職中</option>
+				</select>
+			</div>
+			<div class="item visa-type" style="grid-area: visa-type;">
+				<label class="label" for="visa-type">在留資格</label>
+				<select name="visa-type" id="visa-type" data-attr:disabled="$isEdit">
+					<option value={ helpers.StringOf(d.BasicInfo.VisaType) }>{ helpers.StringOf(d.BasicInfo.VisaType) }</option>
+					<option value="永住権">永住権</option>
+					<option value="留学">留学</option>
+				</select>
+			</div>
+			<div class="item visa-expiry" style="grid-area: visa-expiry;">
+				<label class="label" for="visa-expiry">在留資格有効期限</label>
+				<input type="date" class="value" id="visa-expiry" value={ helpers.DateOf(d.BasicInfo.VisaExpiry) } data-attr:disabled="$isEdit"/>
+			</div>
+			<div class="item legal-name" style="grid-area: legal-name;">
+				<label class="label" for="legal-name">正式名</label>
+				<input type="text" class="value" id="legal-name" value={ helpers.StringOf(d.BasicInfo.LegalName) } data-attr:disabled="$isEdit"/>
+			</div>
+		</div>
+		<div class="fields name" style="grid-area: C;">
+			<div class="item last-name" style="grid-area: last-name;">
+				<label class="label" for="last-name">姓</label>
+				<input type="text" class="value" id="last-name" value={ d.BasicInfo.LastName } data-attr:disabled="$isEdit"/>
+			</div>
+			<div class="item first-name" style="grid-area: first-name;">
+				<label class="label" for="first-name">名</label>
+				<input type="text" class="value" id="first-name" value={ d.BasicInfo.FirstName } data-attr:disabled="$isEdit"/>
+			</div>
+			<div class="item last-name-kana" style="grid-area: last-name-kana;">
+				<label class="label" for="last-name-kana">姓（カナ）</label>
+				<input type="text" class="value" id="last-name-kana" value={ helpers.StringOf(d.BasicInfo.LastNameKana) } data-attr:disabled="$isEdit"/>
+			</div>
+			<div class="item first-name-kana" style="grid-area: first-name-kana;">
+				<label class="label" for="first-name-kana">名（カナ）</label>
+				<input type="text" class="value" id="first-name-kana" value={ helpers.StringOf(d.BasicInfo.FirstNameKana) } data-attr:disabled="$isEdit"/>
+			</div>
+		</div>
+		<div class="fields personal" style="grid-area: D;">
+			<div class="item gender" style="grid-area: gender;">
+				<label class="label" for="gender">性別</label>
+				<input type="text" class="value" id="gender" value={ d.BasicInfo.Gender } data-attr:disabled="$isEdit"/>
+			</div>
+			<div class="item blood-type" style="grid-area: blood-type;">
+				<label class="label" for="blood-type">血液型</label>
+				<select name="blood-type" id="blood-type" data-attr:disabled="$isEdit">
+					<option value="A">A型</option>
+					<option value="B">B型</option>
+					<option value="O">O型</option>
+					<option value="AB">AB型</option>
+					<option value="不明">不明</option>
+				</select>
+			</div>
+			<div class="item birth-date" style="grid-area: birth-date;">
+				<label class="label" for="birth-date">生年月日</label>
+				<input type="date" class="value" id="birth-date" value={ helpers.DateOf(d.BasicInfo.BirthDate) } data-attr:disabled="$isEdit"/>
+			</div>
+		</div>
+		<div class="fields contact" style="grid-area: E;">
+			<div class="item email" style="grid-area: email;">
+				<label class="label" for="email">メールアドレス</label>
+				<input type="text" class="value" id="email" value={ helpers.StringOf(d.BasicInfo.Email) } data-attr:disabled="$isEdit"/>
+			</div>
+			<div class="item phone" style="grid-area: phone;">
+				<label class="label" for="phone">電話番号</label>
+				<input type="text" class="value" id="phone" value={ helpers.StringOf(d.BasicInfo.Phone) } data-attr:disabled="$isEdit"/>
+			</div>
+			<div class="item address" style="grid-area: address;">
+				<label class="label" for="address">住所</label>
+				<input type="text" class="value" id="address" value={ helpers.StringOf(d.BasicInfo.Address) } data-attr:disabled="$isEdit"/>
+			</div>
+		</div>
+		<div class="fields emergency" style="grid-area: F;">
+			for _, contact := range d.EmergencyContacts {
+				{{ emergencyRelationshipID := fmt.Sprintf("emergency-relationship-%d", contact.ID) }}
+				<div class="item">
+					<label class="label" for={ emergencyRelationshipID }>緊急連絡先</label>
+					<input type="text" class="value" id={ emergencyRelationshipID } value={ helpers.StringOf(contact.ContactRelationship) } data-attr:disabled="$isEdit"/>
+				</div>
+				{{ emergencyNameID := fmt.Sprintf("emergency-name-%d", contact.ID) }}
+				<div class="item">
+					<label class="label" for={ emergencyNameID }>名前</label>
+					<input type="text" class="value" id={ emergencyNameID } value={ helpers.StringOf(contact.ContactName) } data-attr:disabled="$isEdit"/>
+				</div>
+				{{ emergencyPhoneID := fmt.Sprintf("emergency-phone-%d", contact.ID) }}
+				<div class="item">
+					<label class="label" for={ emergencyPhoneID }>電話番号</label>
+					<input type="text" class="value" id={ emergencyPhoneID } value={ helpers.StringOf(contact.ContactPhone) } data-attr:disabled="$isEdit"/>
+				</div>
+			}
+		</div>
+	</section>
 }
 
-// EmployeesDetailsInfo は従業員の詳細情報全体を表示するテンプレート
-// fieldGroupTypesで定義された順序ですべての情報グループを表示します
-templ (d EmployeesDetailsData) EmployeesDetailsInfo() {
-	<div class="employee-details">
-		for _, fieldGroupType := range fieldGroupTypes {
-			@EmployeesDetailsFieldGroup(d.EmployeesDetailsFieldsData(fieldGroupType), fieldGroupType+"-info", fieldGroupType)
-		}
-	</div>
-}
+// // 運転免許
+// <section class="license">
+// 	<h2 class="section-title">運転免許</h2>
+// </section>
+// // 学歴
+// <section class="education">
+// 	<h2 class="section-title">学歴</h2>
+// </section>
+// // 職歴
+// <section class="career">
+// 	<h2 class="section-title">職歴</h2>
+// </section>
+// // 資格
+// <section class="qualification">
+// 	<h2 class="section-title">資格</h2>
+// </section>
+// // 保険
+// <section class="insurance">
+// 	<h2 class="section-title">保険</h2>
+// </section>
+// // 健康診断
+// <section class="health-checkup">
+// 	<h2 class="section-title">健康診断</h2>
+// </section>
+// // 教育訓練
+// <section class="training">
+// 	<h2 class="section-title">教育訓練</h2>
+// </section>
+// // 事故履歴
+// <section class="accident">
+// 	<h2 class="section-title">事故履歴</h2>
+// </section>
+// // 違反履歴
+// <section class="violation">
+// 	<h2 class="section-title">違反履歴</h2>
+// </section>
+// // 銀行口座
+// <section class="bank">
+// 	<h2 class="section-title">銀行口座</h2>
+// </section>
+// // 退職情報
+// <section class="retirement">
+// 	<h2 class="section-title">退職情報</h2>
+// </section>

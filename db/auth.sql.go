@@ -205,7 +205,7 @@ type GetEmployeeForLoginRow struct {
 	FailedLoginAttempts *int32             `json:"failed_login_attempts"`
 	LockedUntil         pgtype.Timestamptz `json:"locked_until"`
 	LastLoginAt         pgtype.Timestamptz `json:"last_login_at"`
-	IsActive            *bool              `json:"is_active"`
+	IsActive            bool               `json:"is_active"`
 }
 
 // ==============================

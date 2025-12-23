@@ -41,43 +41,6 @@ func (a *App) GetEmployeeBasicInfo(ctx context.Context, employeeID int32) (db.Ge
 	return basicInfo, nil
 }
 
-// GetEmployeeBanks は従業員の銀行口座情報を取得します
-func (a *App) GetEmployeeBanks(ctx context.Context, employeeID int32) ([]db.MBank, error) {
-	banks, err := a.db.GetEmployeeBanks(ctx, employeeID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get banks: %w", err)
-	}
-	return banks, nil
-}
-
-// GetEmployeeContactInfo は従業員の連絡先情報（住所、メール、電話）を取得します
-func (a *App) GetEmployeeContactInfo(ctx context.Context, employeeID int32) (
-	addresses []db.MAddress,
-	emails []db.MEmail,
-	phones []db.MPhone,
-	err error,
-) {
-	// 住所を取得
-	addresses, err = a.db.GetEmployeeAddresses(ctx, employeeID)
-	if err != nil {
-		return nil, nil, nil, fmt.Errorf("failed to get addresses: %w", err)
-	}
-
-	// メールアドレスを取得
-	emails, err = a.db.GetEmployeeEmails(ctx, employeeID)
-	if err != nil {
-		return nil, nil, nil, fmt.Errorf("failed to get emails: %w", err)
-	}
-
-	// 電話番号を取得
-	phones, err = a.db.GetEmployeePhones(ctx, employeeID)
-	if err != nil {
-		return nil, nil, nil, fmt.Errorf("failed to get phones: %w", err)
-	}
-
-	return addresses, emails, phones, nil
-}
-
 // GetEmployeeEmergencyContacts は従業員の緊急連絡先を取得します
 func (a *App) GetEmployeeEmergencyContacts(ctx context.Context, employeeID int32) ([]db.EmergencyContact, error) {
 	emergencyContacts, err := a.db.GetEmployeeEmergencyContacts(ctx, employeeID)
@@ -171,18 +134,6 @@ func (a *App) GetEmployeeDetailsData(ctx context.Context, employeeID int32) (*pa
 		return nil, err
 	}
 
-	// 銀行口座を取得
-	banks, err := a.GetEmployeeBanks(ctx, employeeID)
-	if err != nil {
-		return nil, err
-	}
-
-	// 連絡先情報を取得
-	addresses, emails, phones, err := a.GetEmployeeContactInfo(ctx, employeeID)
-	if err != nil {
-		return nil, err
-	}
-
 	// 緊急連絡先を取得
 	emergencyContacts, err := a.GetEmployeeEmergencyContacts(ctx, employeeID)
 	if err != nil {
@@ -210,10 +161,6 @@ func (a *App) GetEmployeeDetailsData(ctx context.Context, employeeID int32) (*pa
 	// すべてのデータを構造体にまとめて返す
 	return &pages.EmployeesDetailsData{
 		BasicInfo:            basicInfo,
-		Banks:                banks,
-		Addresses:            addresses,
-		Emails:               emails,
-		Phones:               phones,
 		EmergencyContacts:    emergencyContacts,
 		TrainingRecords:      trainingRecords,
 		HealthCheckupRecords: healthCheckupRecords,

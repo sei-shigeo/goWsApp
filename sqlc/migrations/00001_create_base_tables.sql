@@ -140,7 +140,13 @@ CREATE TABLE IF NOT EXISTS employees (
     last_name_kana VARCHAR(100),
     first_name_kana VARCHAR(100),
     legal_name VARCHAR(200),
-    gender VARCHAR(20) NOT NULL CHECK (gender IN ('男', '女', 'その他')),
+    gender VARCHAR(20) NOT NULL DEFAULT '不明' CHECK (gender IN ('男', '女', 'その他')),
+    blood_type VARCHAR(20) NOT NULL DEFAULT '不明' CHECK (blood_type IN ('A', 'B', 'O', 'AB', '不明')),
+
+    -- 連絡先
+    address VARCHAR(500),
+    phone VARCHAR(20),
+    email VARCHAR(255),
     
     -- 雇用情報
     birth_date DATE, --生年月日
@@ -169,11 +175,21 @@ CREATE TABLE IF NOT EXISTS employees (
     driving_disabled_reason TEXT, --運転停止理由
     
     -- 在留資格
-    nationality VARCHAR(50) DEFAULT '日本',
-    visa_type VARCHAR(50),
-    visa_expiry DATE,
+    nationality VARCHAR(50) NOT NULL DEFAULT '日本',
+    visa_type VARCHAR(50) DEFAULT '永住権', -- 在留資格種別
+    visa_expiry DATE, -- 在留資格有効期限
     visa_image_url_front VARCHAR(255),
     visa_image_url_back VARCHAR(255),
+
+    -- 銀行
+    bank_code VARCHAR(50), -- 銀行コード    
+    bank_name VARCHAR(255), -- 銀行名
+    bank_branch_code VARCHAR(50), -- 銀行支店コード
+    bank_branch_name VARCHAR(255), -- 銀行支店名
+    bank_account_type VARCHAR(50), -- 銀行口座種別
+    bank_account_number VARCHAR(50), -- 銀行口座番号
+    bank_account_name VARCHAR(255), -- 銀行口座名
+    bank_account_kana VARCHAR(255), -- 銀行口座名（カナ）
     
     -- 認証情報
     role_id INTEGER REFERENCES m_roles(id) ON DELETE SET NULL, -- 権限（管理者/一般）
@@ -184,7 +200,7 @@ CREATE TABLE IF NOT EXISTS employees (
     last_login_at TIMESTAMP WITH TIME ZONE, -- 最終ログイン日時
     
     -- ステータス
-    is_active BOOLEAN DEFAULT true,
+    is_active BOOLEAN NOT NULL DEFAULT true,
     
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -199,26 +215,28 @@ CREATE INDEX idx_employees_active ON employees(is_active);
 INSERT INTO employees (
     employee_code, 
     last_name, first_name, last_name_kana, first_name_kana, legal_name, 
-    gender, birth_date, 
+    phone,email,address,
+    gender, birth_date, blood_type,
     hire_date, office_id, role_id, password_hash) VALUES 
-    ('E-001', '茂雄', '清', 'シゲオ', 'セイ', 'Rafael Shigueo Sei', '男', CURRENT_DATE, CURRENT_DATE, 2, 1, '$2a$10$dummy_hash_for_admin'),
-    ('E-002', 'アケミ', '伴', 'アケミ', 'バン', 'Akemi Ban', '女', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
-    ('E-003', 'マサヒロ', '藤原', 'マサヒロ', 'フジワラ', 'Masahiro Fujiwara', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
-    ('E-004', 'ヒロシ', '田中', 'ヒロシ', 'タナカ', 'Hiroshi Tanaka', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
-    ('E-005', 'タカシ', '渡辺', 'タカシ', 'ワタナベ', 'Takashi Watanabe', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
-    ('E-006', 'ナオミ', '山田', 'ナオミ', 'ヤマダ', 'Naomi Yamada', '女', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
-    ('E-007', 'マサユキ', '佐藤', 'マサユキ', 'サトウ', 'Masayuki Sato', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
-    ('E-008', 'ナオト', '鈴木', 'ナオト', 'スズキ', 'Naoto Suzuki', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
-    ('E-009', 'ヒロミ', '高橋', 'ヒロミ', 'タカハシ', 'Hiroshi Takahashi', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
-    ('E-010', 'ナオユキ', '伊藤', 'ナオユキ', 'イトウ', 'Naoyuki Ito', '女', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
-    ('E-011', 'マサユキ', '渡辺', 'マサユキ', 'ワタナベ', 'Masayuki Watanabe', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
-    ('E-012', 'ナオミ', '山田', 'ナオミ', 'ヤマダ', 'Naomi Yamada', '女', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
-    ('E-013', 'マサユキ', '佐藤', 'マサユキ', 'サトウ', 'Masayuki Sato', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
-    ('E-014', 'ナオト', '鈴木', 'ナオト', 'スズキ', 'Naoto Suzuki', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
-    ('E-015', 'ヒロミ', '高橋', 'ヒロミ', 'タカハシ', 'Hiroshi Takahashi', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
-    ('E-016', 'ナオユキ', '伊藤', 'ナオユキ', 'イトウ', 'Naoyuki Ito', '女', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
-    ('E-017', 'マサユキ', '渡辺', 'マサユキ', 'ワタナベ', 'Masayuki Watanabe', '男', CURRENT_DATE, CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
-    ('E-018', 'ナオミ', '山田', 'ナオミ', 'ヤマダ', 'Naomi Yamada', '女', CURRENT_DATE, NULL, 1, 2, '$2a$10$dummy_hash_for_user');
+    ('E-001', '茂雄', '清', 'シゲオ', 'セイ', 'Rafael Shigueo Sei', '090-1111-2222', 'shigeo.sei@wasei.co.jp', '愛知県名古屋市中区栄3-4-5', '男', CURRENT_DATE, 'A', CURRENT_DATE, 2, 1, '$2a$10$dummy_hash_for_admin'),
+    ('E-002', 'アケミ', '伴', 'アケミ', 'バン', 'Akemi Ban', '090-2222-3333', 'akemi.ban@wasei.co.jp', '東京都千代田区永田町1-7-1', '女', CURRENT_DATE, 'B', CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-003', 'マサヒロ', '藤原', 'マサヒロ', 'フジワラ', 'Masahiro Fujiwara', '090-3333-4444', 'masahiro.fujiwara@wasei.co.jp', '東京都千代田区永田町1-7-1', '男', CURRENT_DATE, 'O', CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-004', 'ヒロシ', '田中', 'ヒロシ', 'タナカ', 'Hiroshi Tanaka', '090-4444-5555', 'hiroshi.tanaka@wasei.co.jp', '東京都千代田区永田町1-7-1', '男', CURRENT_DATE, 'AB', CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-005', 'タカシ', '渡辺', 'タカシ', 'ワタナベ', 'Takashi Watanabe', '090-5555-6666', 'takashi.watanabe@wasei.co.jp', '東京都千代田区永田町1-7-1', '男', CURRENT_DATE, 'A', CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-006', 'ナオミ', '山田', 'ナオミ', 'ヤマダ', 'Naomi Yamada', '090-6666-7777', 'naomi.yamada@wasei.co.jp', '東京都千代田区永田町1-7-1', '女', CURRENT_DATE, 'O', CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-007', 'マサユキ', '佐藤', 'マサユキ', 'サトウ', 'Masayuki Sato', '090-7777-8888', 'masayuki.sato@wasei.co.jp', '東京都千代田区永田町1-7-1', '男', CURRENT_DATE, 'B', CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-008', 'ナオト', '鈴木', 'ナオト', 'スズキ', 'Naoto Suzuki', '090-8888-9999', 'naoto.suzuki@wasei.co.jp', '東京都千代田区永田町1-7-1', '男', CURRENT_DATE, 'O', CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-009', 'ヒロミ', '高橋', 'ヒロミ', 'タカハシ', 'Hiroshi Takahashi', '090-9999-0000', 'hiroshi.takahashi@wasei.co.jp', '東京都千代田区永田町1-7-1', '男', CURRENT_DATE, 'AB', CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-010', 'ナオユキ', '伊藤', 'ナオユキ', 'イトウ', 'Naoyuki Ito', '090-0000-1111', 'naoyuki.ito@wasei.co.jp', '東京都千代田区永田町1-7-1', '女', CURRENT_DATE, 'A', CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-011', 'マサユキ', '渡辺', 'マサユキ', 'ワタナベ', 'Masayuki Watanabe', '090-1111-2222', 'masayuki.watanabe@wasei.co.jp', '東京都千代田区永田町1-7-1', '男', CURRENT_DATE, 'B', CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-012', 'ナオミ', '山田', 'ナオミ', 'ヤマダ', 'Naomi Yamada', '090-2222-3333', 'naomi.yamada@wasei.co.jp', '東京都千代田区永田町1-7-1', '女', CURRENT_DATE, '不明', CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-013', 'マサユキ', '佐藤', 'マサユキ', 'サトウ', 'Masayuki Sato', '090-3333-4444', 'masayuki.sato@wasei.co.jp', '東京都千代田区永田町1-7-1', '男', CURRENT_DATE, 'B', CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-014', 'ナオト', '鈴木', 'ナオト', 'スズキ', 'Naoto Suzuki', '090-4444-5555', 'naoto.suzuki@wasei.co.jp', '東京都千代田区永田町1-7-1', '男', CURRENT_DATE, 'O', CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-015', 'ヒロミ', '高橋', 'ヒロミ', 'タカハシ', 'Hiroshi Takahashi', '090-5555-6666', 'hiroshi.takahashi@wasei.co.jp', '東京都千代田区永田町1-7-1', '男', CURRENT_DATE, 'AB', CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-016', 'ナオユキ', '伊藤', 'ナオユキ', 'イトウ', 'Naoyuki Ito', '090-6666-7777', 'naoyuki.ito@wasei.co.jp', '東京都千代田区永田町1-7-1', '女', CURRENT_DATE, 'A', CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-017', 'マサユキ', '渡辺', 'マサユキ', 'ワタナベ', 'Masayuki Watanabe', '090-7777-8888', 'masayuki.watanabe@wasei.co.jp', '東京都千代田区永田町1-7-1', '男', CURRENT_DATE, 'B', CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-018', 'ナオミ', '山田', 'ナオミ', 'ヤマダ', 'Naomi Yamada', '090-8888-9999', 'naomi.yamada@wasei.co.jp', '東京都千代田区永田町1-7-1', '女', CURRENT_DATE, '不明', CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user'),
+    ('E-019', 'マサユキ', '佐藤', 'マサユキ', 'サトウ', 'Masayuki Sato', '090-9999-0000', 'masayuki.sato@wasei.co.jp', '東京都千代田区永田町1-7-1', '男', CURRENT_DATE, '不明', CURRENT_DATE, 1, 2, '$2a$10$dummy_hash_for_user');
 
 -- company_officesのmanager_idに外部キー制約を追加
 ALTER TABLE company_offices 

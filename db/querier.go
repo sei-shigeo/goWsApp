@@ -139,10 +139,6 @@ type Querier interface {
 	GetDeliveryOrderByNumber(ctx context.Context, orderNumber string) (GetDeliveryOrderByNumberRow, error)
 	// 事故履歴
 	GetEmployeeAccidentRecords(ctx context.Context, employeeID int32) ([]AccidentRecord, error)
-	// 住所
-	GetEmployeeAddresses(ctx context.Context, ownerID int32) ([]MAddress, error)
-	// 銀行
-	GetEmployeeBanks(ctx context.Context, ownerID int32) ([]MBank, error)
 	// 基本情報 + 所属事業所 + 制限情報
 	GetEmployeeBasicInfo(ctx context.Context, id int32) (GetEmployeeBasicInfoRow, error)
 	GetEmployeeCardList(ctx context.Context, arg GetEmployeeCardListParams) ([]GetEmployeeCardListRow, error)
@@ -150,8 +146,6 @@ type Querier interface {
 	GetEmployeeCareerRecords(ctx context.Context, employeeID int32) ([]CareerRecord, error)
 	// 学歴
 	GetEmployeeEducationRecords(ctx context.Context, employeeID int32) ([]EducationRecord, error)
-	// メールアドレス
-	GetEmployeeEmails(ctx context.Context, ownerID int32) ([]MEmail, error)
 	// 緊急連絡先
 	GetEmployeeEmergencyContacts(ctx context.Context, employeeID int32) ([]EmergencyContact, error)
 	// ==============================
@@ -163,8 +157,6 @@ type Querier interface {
 	GetEmployeeHealthCheckupRecords(ctx context.Context, employeeID int32) ([]HealthCheckupRecord, error)
 	// 保険
 	GetEmployeeInsuranceRecords(ctx context.Context, employeeID int32) ([]InsuranceRecord, error)
-	// 電話番号
-	GetEmployeePhones(ctx context.Context, ownerID int32) ([]MPhone, error)
 	// 資格
 	GetEmployeeQualificationRecords(ctx context.Context, employeeID int32) ([]QualificationRecord, error)
 	// 教育訓練

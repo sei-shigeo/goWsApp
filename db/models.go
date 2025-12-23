@@ -242,6 +242,10 @@ type Employee struct {
 	FirstNameKana              *string            `json:"first_name_kana"`
 	LegalName                  *string            `json:"legal_name"`
 	Gender                     string             `json:"gender"`
+	BloodType                  string             `json:"blood_type"`
+	Address                    *string            `json:"address"`
+	Phone                      *string            `json:"phone"`
+	Email                      *string            `json:"email"`
 	BirthDate                  pgtype.Date        `json:"birth_date"`
 	HireDate                   pgtype.Date        `json:"hire_date"`
 	AppointmentDate            pgtype.Date        `json:"appointment_date"`
@@ -262,18 +266,26 @@ type Employee struct {
 	DriverLicenseImageUrlBack  *string            `json:"driver_license_image_url_back"`
 	DrivingDisabledDate        pgtype.Date        `json:"driving_disabled_date"`
 	DrivingDisabledReason      *string            `json:"driving_disabled_reason"`
-	Nationality                *string            `json:"nationality"`
+	Nationality                string             `json:"nationality"`
 	VisaType                   *string            `json:"visa_type"`
 	VisaExpiry                 pgtype.Date        `json:"visa_expiry"`
 	VisaImageUrlFront          *string            `json:"visa_image_url_front"`
 	VisaImageUrlBack           *string            `json:"visa_image_url_back"`
+	BankCode                   *string            `json:"bank_code"`
+	BankName                   *string            `json:"bank_name"`
+	BankBranchCode             *string            `json:"bank_branch_code"`
+	BankBranchName             *string            `json:"bank_branch_name"`
+	BankAccountType            *string            `json:"bank_account_type"`
+	BankAccountNumber          *string            `json:"bank_account_number"`
+	BankAccountName            *string            `json:"bank_account_name"`
+	BankAccountKana            *string            `json:"bank_account_kana"`
 	RoleID                     *int32             `json:"role_id"`
 	PasswordHash               *string            `json:"password_hash"`
 	PasswordUpdatedAt          pgtype.Timestamptz `json:"password_updated_at"`
 	FailedLoginAttempts        *int32             `json:"failed_login_attempts"`
 	LockedUntil                pgtype.Timestamptz `json:"locked_until"`
 	LastLoginAt                pgtype.Timestamptz `json:"last_login_at"`
-	IsActive                   *bool              `json:"is_active"`
+	IsActive                   bool               `json:"is_active"`
 	CreatedAt                  pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt                  pgtype.Timestamptz `json:"updated_at"`
 	DeletedAt                  pgtype.Timestamptz `json:"deleted_at"`

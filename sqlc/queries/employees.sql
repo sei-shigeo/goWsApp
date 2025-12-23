@@ -1,17 +1,15 @@
 -- name: GetEmployeeCardList :many
 SELECT 
-    e.id, 
-    e.employee_code, 
-    e.employee_image_url, 
-    e.last_name, 
-    e.first_name,
-    m.email,
-    p.phone_number
-FROM employees e
-LEFT JOIN m_emails m ON e.id = m.owner_id AND m.owner_type = 'employee' AND m.is_primary = true
-LEFT JOIN m_phones p ON e.id = p.owner_id AND p.owner_type = 'employee' AND p.is_primary = true
-WHERE e.deleted_at IS NULL
-ORDER BY e.employee_code
+    id, 
+    employee_code, 
+    employee_image_url, 
+    last_name, 
+    first_name,
+    email,
+    phone
+FROM employees
+WHERE deleted_at IS NULL
+ORDER BY employee_code
 LIMIT $1 OFFSET $2;
 
 -- 基本情報 + 所属事業所 + 制限情報
@@ -25,22 +23,6 @@ FROM employees e
 LEFT JOIN company_offices co ON e.office_id = co.id AND co.deleted_at IS NULL
 LEFT JOIN m_roles r ON e.role_id = r.id
 WHERE e.id = $1 AND e.deleted_at IS NULL;
-
--- 住所
--- name: GetEmployeeAddresses :many
-SELECT * FROM m_addresses WHERE owner_id = $1 AND owner_type = 'employee';
-
--- メールアドレス
--- name: GetEmployeeEmails :many
-SELECT * FROM m_emails WHERE owner_id = $1 AND owner_type = 'employee';
-
--- 電話番号
--- name: GetEmployeePhones :many
-SELECT * FROM m_phones WHERE owner_id = $1 AND owner_type = 'employee';
-
--- 銀行
--- name: GetEmployeeBanks :many
-SELECT * FROM m_banks WHERE owner_id = $1 AND owner_type = 'employee';
 
 -- 緊急連絡先
 -- name: GetEmployeeEmergencyContacts :many

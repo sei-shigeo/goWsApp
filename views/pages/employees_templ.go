@@ -60,7 +60,7 @@ func Employees(employees []db.GetEmployeeCardListRow) templ.Component {
 			}
 			templ_7745c5c3_Err = components.Button(components.ButtonProps{
 				Icon:    "add",
-				Label:   "従業員作成",
+				Label:   "'従業員作成'",
 				OnClick: "@get('/employees/create')",
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {

@@ -51,6 +51,9 @@
   --border-radius-md: 1.875rem; /* 30px */
   --border-radius-circle: 50%;
 
+  /* border color */
+  --border-color: #dee2e6;
+
   /* spacing */
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
@@ -102,6 +105,25 @@ input {
   border: none;
   outline: none;
   background-color: transparent;
+  &[type="date"] {
+    padding: 0;
+    &::-webkit-calendar-picker-indicator {
+      padding: 0;
+      font-size: var(--font-size-xs);
+    }
+    &::-webkit-datetime-edit {
+      font-size: var(--font-size-sm);
+    }
+  }
+}
+
+select {
+  appearance: none;
+  border: none;
+}
+
+:disabled {
+  opacity: 1;
 }
 
 :where(ul, li, ol) {
@@ -146,6 +168,30 @@ var {
 body {
   font-family: "Roboto", sans-serif;
   color: var(--black);
+}
+
+.primary {
+  color: var(--primary);
+}
+
+.secondary {
+  color: var(--secondary);
+}
+
+.success {
+  color: var(--success);
+}
+
+.danger {
+  color: var(--danger);
+}
+
+.warning {
+  color: var(--warning);
+}
+
+.info {
+  color: var(--info);
 }
 
 .material-symbols-outlined {
@@ -243,7 +289,7 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     align-items: center;
-    border-bottom: 1px solid var(--sidebar-item-hover);
+    border-bottom: 1px solid var(--border-color);
     padding-inline: var(--spacing-sm);
   }
 
@@ -252,6 +298,7 @@ body {
     justify-content: flex-end;
     gap: var(--spacing-sm);
     padding: var(--spacing-sm);
+    border-bottom: 1px solid var(--border-color);
   }
   & > .content {
     padding-inline: var(--spacing-sm);
@@ -411,21 +458,143 @@ body {
 
 /* Employee Details Components */
 .employee-details {
-  display: grid;
-  grid-template-areas:
-    "role role"
-    "basic basic"
-    "email email"
-    "phone phone"
-    "address address"
-    "emergency-contact emergency-contact"
-    "employment retirement"
-    "driver-license driver-license"
-    "visa visa"
-    "status bank"
-    "training health-checkup"
-    "qualification insurance"
-    "education career"
-    "accident violation";
-  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+
+  & > .selected-section {
+    padding: var(--spacing-sm);
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-5);
+    color: var(--black);
+    margin-bottom: var(--spacing-xs);
+    border-radius: var(--border-radius-xs);
+    width: max-content;
+
+    &:hover {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+    &:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+  }
+
+  & > .section {
+    padding: var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-xs);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: grid;
+    gap: var(--spacing-sm);
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "A B"
+      "A B"
+      "A D"
+      "C C"
+      "E E"
+      "F F";
+    & select {
+      padding: var(--spacing-xs);
+      border: none;
+      border-bottom: 1px solid var(--border-color);
+      background-color: transparent;
+      color: var(--black);
+    }
+    & input[type="date"] {
+      padding: 0;
+      border: none;
+      background-color: transparent;
+      &::-webkit-calendar-picker-indicator {
+        padding: 0;
+      }
+    }
+
+    & > .fields {
+      display: grid;
+      gap: var(--spacing-sm);
+      &.image {
+        grid-template-columns: 1fr;
+        grid-template-areas: "img";
+      }
+      &.header {
+        grid-template-columns: 150px 150px 1fr;
+        grid-template-areas:
+          "code nationality status"
+          "visa-type visa-expiry legal-name";
+      }
+      &.name {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-areas:
+          "last-name first-name"
+          "last-name-kana first-name-kana"
+          "legal-name legal-name";
+      }
+      &.personal {
+        grid-template-columns: 150px 150px 1fr;
+        grid-template-areas: "gender blood-type birth-date";
+      }
+      &.contact {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-areas:
+          "phone email"
+          "address address";
+      }
+      &.emergency {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      & > .item {
+        display: flex;
+        flex-direction: column;
+        & > .label {
+          font-size: var(--font-size-xs);
+          font-weight: var(--font-weight-5);
+        }
+        & > .value {
+          font-size: var(--font-size-sm);
+          padding: var(--spacing-xs);
+          border-bottom: 1px solid var(--border-color);
+        }
+      }
+    }
+  }
+}
+/* A4サイズ用の印刷スタイル */
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+
+  body {
+    font-size: 10pt;
+  }
+
+  /* 印刷時に不要な要素を非表示 */
+  .sidebar,
+  .header,
+  .actions-container,
+  .selected-section,
+  button {
+    display: none !important;
+  }
+
+  .employee-details {
+    width: 100%;
+    max-width: 210mm; /* A4の幅 */
+    padding: 0;
+
+    & > .section {
+      page-break-inside: avoid; /* セクションの途中で改ページしない */
+    }
+  }
+
+  /* 背景色を印刷用に調整 */
+  .fields {
+    background-color: transparent !important;
+    border: 1px solid #333;
+  }
 }

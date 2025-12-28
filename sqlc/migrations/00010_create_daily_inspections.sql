@@ -121,12 +121,12 @@ CREATE TABLE IF NOT EXISTS vehicle_daily_inspections (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_daily_inspections_vehicle ON vehicle_daily_inspections(vehicle_id);
-CREATE INDEX idx_daily_inspections_driver ON vehicle_daily_inspections(driver_id);
-CREATE INDEX idx_daily_inspections_date ON vehicle_daily_inspections(inspection_date);
-CREATE INDEX idx_daily_inspections_vehicle_date ON vehicle_daily_inspections(vehicle_id, inspection_date);
-CREATE INDEX idx_daily_inspections_status ON vehicle_daily_inspections(overall_status);
-CREATE INDEX idx_daily_inspections_abnormality ON vehicle_daily_inspections(abnormality_found) WHERE abnormality_found = true;
+CREATE INDEX IF NOT EXISTS idx_daily_inspections_vehicle ON vehicle_daily_inspections(vehicle_id);
+CREATE INDEX IF NOT EXISTS idx_daily_inspections_driver ON vehicle_daily_inspections(driver_id);
+CREATE INDEX IF NOT EXISTS idx_daily_inspections_date ON vehicle_daily_inspections(inspection_date);
+CREATE INDEX IF NOT EXISTS idx_daily_inspections_vehicle_date ON vehicle_daily_inspections(vehicle_id, inspection_date);
+CREATE INDEX IF NOT EXISTS idx_daily_inspections_status ON vehicle_daily_inspections(overall_status);
+CREATE INDEX IF NOT EXISTS idx_daily_inspections_abnormality ON vehicle_daily_inspections(abnormality_found) WHERE abnormality_found = true;
 
 -- サンプルデータ
 INSERT INTO vehicle_daily_inspections (

@@ -23,9 +23,9 @@ CREATE TABLE IF NOT EXISTS sessions (
     last_accessed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_sessions_employee ON sessions(employee_id);
-CREATE INDEX idx_sessions_token ON sessions(session_token);
-CREATE INDEX idx_sessions_expires ON sessions(expires_at);
+CREATE INDEX IF NOT EXISTS idx_sessions_employee ON sessions(employee_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(session_token);
+CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions(expires_at);
 
 -- ログイン履歴テーブル
 CREATE TABLE IF NOT EXISTS login_logs (
@@ -45,10 +45,10 @@ CREATE TABLE IF NOT EXISTS login_logs (
     attempted_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_login_logs_employee ON login_logs(employee_id);
-CREATE INDEX idx_login_logs_code ON login_logs(employee_code);
-CREATE INDEX idx_login_logs_attempted ON login_logs(attempted_at);
-CREATE INDEX idx_login_logs_success ON login_logs(login_success);
+CREATE INDEX IF NOT EXISTS idx_login_logs_employee ON login_logs(employee_id);
+CREATE INDEX IF NOT EXISTS idx_login_logs_code ON login_logs(employee_code);
+CREATE INDEX IF NOT EXISTS idx_login_logs_attempted ON login_logs(attempted_at);
+CREATE INDEX IF NOT EXISTS idx_login_logs_success ON login_logs(login_success);
 
 -- +goose StatementEnd
 

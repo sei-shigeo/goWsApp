@@ -1,11 +1,14 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/sei-shigeo/webApp/db"
+	"github.com/sei-shigeo/webApp/helpers"
 	"github.com/sei-shigeo/webApp/views/pages"
+	"github.com/starfederation/datastar-go/datastar"
 )
 
 // EmployeesRouter は従業員関連のすべてのルーティングを設定します
@@ -42,6 +45,74 @@ func (a *App) EmployeesRouter() error {
 		}
 
 		pageData.EmployeesDetails().Render(r.Context(), w)
+	})
+
+	a.mux.HandleFunc("PATCH /employees/update/{id}", func(w http.ResponseWriter, r *http.Request) {
+		id := r.PathValue("id")
+		idInt, err := strconv.Atoi(id)
+		if err != nil {
+			http.Error(w, "Invalid ID", http.StatusBadRequest)
+			return
+		}
+
+		// フロントエンドから送られてくるシグナルは GetEmployeeBasicInfoRow の構造
+		sig := &pages.EmployeeBasicInfoSignals{}
+		if err := datastar.ReadSignals(r, sig); err != nil {
+			http.Error(w, fmt.Sprintf("Failed to read signals: %v", err), 500)
+			return
+		}
+
+		photoDate, err := helpers.DateFromStringPtr(sig.EmployeePhotoDate)
+		if err != nil {
+			http.Error(w, "bad employee_photo_date", 400)
+			return
+		}
+
+		visaExpiry, err := helpers.DateFromStringPtr(sig.VisaExpiry)
+		if err != nil {
+			http.Error(w, "bad visa_expiry", 400)
+			return
+		}
+
+		params := db.EmployeeBasicInfoUpdateParams{
+			ID:                int32(idInt),
+			EmployeeCode:      sig.EmployeeCode,
+			EmployeeImageUrl:  sig.EmployeeImageUrl,
+			EmployeePhotoDate: photoDate,
+
+			LastName:      sig.LastName,
+			FirstName:     sig.FirstName,
+			LastNameKana:  sig.LastNameKana,
+			FirstNameKana: sig.FirstNameKana,
+			LegalName:     sig.LegalName,
+			Gender:        sig.Gender,
+			BloodType:     sig.BloodType,
+
+			Address: sig.Address,
+			Phone:   sig.Phone,
+			Email:   sig.Email,
+
+			EmergencyContactRelationship: sig.EmergencyContactRelationship,
+			EmergencyContactName:         sig.EmergencyContactName,
+			EmergencyContactPhone:        sig.EmergencyContactPhone,
+			EmergencyContactEmail:        sig.EmergencyContactEmail,
+			EmergencyContactAddress:      sig.EmergencyContactAddress,
+
+			NationalityID: sig.NationalityID,
+			VisaType:      sig.VisaType,
+			VisaExpiry:    visaExpiry,
+		}
+
+		updateEmployee, err := a.db.EmployeeBasicInfoUpdate(r.Context(), params)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to update employee basic info: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Println("updateEmployee: ", updateEmployee)
+
+		sse := datastar.NewSSE(w, r)
+		sse.MarshalAndPatchSignals(sig)
 	})
 
 	// EmployeesPrintHandler は従業員印刷ページを表示します

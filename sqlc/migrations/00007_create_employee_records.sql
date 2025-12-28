@@ -5,24 +5,6 @@
 -- 従業員関連テーブル
 -- ==============================
 
--- 緊急連絡先
-CREATE TABLE IF NOT EXISTS emergency_contacts (
-    id SERIAL PRIMARY KEY,
-    employee_id INTEGER NOT NULL REFERENCES employees(id) ON DELETE CASCADE,
-    contact_name VARCHAR(100),
-    contact_relationship VARCHAR(50),
-    contact_phone VARCHAR(20),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX idx_emergency_contacts_employee ON emergency_contacts(employee_id);
-
-INSERT INTO emergency_contacts (employee_id, contact_name, contact_relationship, contact_phone) VALUES 
-    (1, '山田太郎', '父', '090-1234-5678'),
-    (1, '山田花子', '母', '090-1234-5679'),
-    (2, '佐藤一郎', '父', '090-1234-5680');
-
 -- 教育訓練履歴テーブル
 CREATE TABLE IF NOT EXISTS training_records (
     id SERIAL PRIMARY KEY,
@@ -55,8 +37,8 @@ CREATE TABLE IF NOT EXISTS health_checkup_records (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_health_checkup_records_employee ON health_checkup_records(employee_id);
-CREATE INDEX idx_health_checkup_records_date ON health_checkup_records(checkup_date);
+CREATE INDEX IF NOT EXISTS idx_health_checkup_records_employee ON health_checkup_records(employee_id);
+CREATE INDEX IF NOT EXISTS idx_health_checkup_records_date ON health_checkup_records(checkup_date);
 
 INSERT INTO health_checkup_records (employee_id, checkup_date, checkup_type, overall_result, medical_institution, notes) VALUES 
     (1, '2025-04-01', '定期', '異常なし', 'さくら健康診断センター', '特記事項なし'),
@@ -78,7 +60,7 @@ CREATE TABLE IF NOT EXISTS qualification_records (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_qualification_records_employee ON qualification_records(employee_id);
+CREATE INDEX IF NOT EXISTS idx_qualification_records_employee ON qualification_records(employee_id);
 
 INSERT INTO qualification_records (employee_id, qualification_type, qualification_date, qualification_number) VALUES 
     (1, 'フォークリフト', '2020-03-15', 'FL-2020-123456'),
@@ -97,7 +79,7 @@ CREATE TABLE IF NOT EXISTS insurance_records (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_insurance_records_employee ON insurance_records(employee_id);
+CREATE INDEX IF NOT EXISTS idx_insurance_records_employee ON insurance_records(employee_id);
 
 INSERT INTO insurance_records (employee_id, insurance_type, insurance_date, insurance_number) VALUES 
     (1, '健康保険', '2024-04-01', '12345678901'),
@@ -121,7 +103,7 @@ CREATE TABLE IF NOT EXISTS education_records (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_education_records_employee ON education_records(employee_id);
+CREATE INDEX IF NOT EXISTS idx_education_records_employee ON education_records(employee_id);
 
 INSERT INTO education_records (employee_id, education_type, education_date, education_institution, notes) VALUES 
     (1, '中学校', '2012-04-01', '愛知県立名古屋商業中学校', '卒業'),
@@ -144,7 +126,7 @@ CREATE TABLE IF NOT EXISTS career_records (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_career_records_employee ON career_records(employee_id);
+CREATE INDEX IF NOT EXISTS idx_career_records_employee ON career_records(employee_id);
 
 INSERT INTO career_records (employee_id, company_name, start_date, end_date, job_type, retirement_reason) VALUES 
     (1, '株式会社エース物流', '2015-04-01', '2018-04-01', '運転手', '会社が倒産したため'),
@@ -164,8 +146,8 @@ CREATE TABLE IF NOT EXISTS accident_records (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_accident_records_employee ON accident_records(employee_id);
-CREATE INDEX idx_accident_records_date ON accident_records(accident_date);
+CREATE INDEX IF NOT EXISTS idx_accident_records_employee ON accident_records(employee_id);
+CREATE INDEX IF NOT EXISTS idx_accident_records_date ON accident_records(accident_date);
 
 -- 違反履歴テーブル
 CREATE TABLE IF NOT EXISTS violation_records (
@@ -179,15 +161,14 @@ CREATE TABLE IF NOT EXISTS violation_records (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_violation_records_employee ON violation_records(employee_id);
-CREATE INDEX idx_violation_records_date ON violation_records(violation_date);
+CREATE INDEX IF NOT EXISTS idx_violation_records_employee ON violation_records(employee_id);
+CREATE INDEX IF NOT EXISTS idx_violation_records_date ON violation_records(violation_date);
 
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
 
-DROP TABLE IF EXISTS emergency_contacts CASCADE;
 DROP TABLE IF EXISTS violation_records CASCADE;
 DROP TABLE IF EXISTS accident_records CASCADE;
 DROP TABLE IF EXISTS career_records CASCADE;

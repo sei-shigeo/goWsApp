@@ -7,31 +7,6 @@ import (
 	"github.com/sei-shigeo/webApp/db"
 	"github.com/sei-shigeo/webApp/views/pages"
 )
-
-// =========================================
-// 従業員データ取得用リポジトリ関数
-// =========================================
-//
-// このファイルには従業員に関するデータ取得ロジックが含まれています。
-// 各関数は独立して使用でき、必要なデータだけを取得できます。
-//
-// 使用例:
-//
-// 基本情報のみ（編集ページなど）
-//   basicInfo, err := app.GetEmployeeBasicInfo(ctx, employeeID)
-//
-// 連絡先情報のみ（連絡先ページなど）
-//   addresses, emails, phones, err := app.GetEmployeeContactInfo(ctx, employeeID)
-//
-// すべてのデータ（詳細ページなど）
-//   allData, err := app.GetEmployeeAllData(ctx, employeeID)
-//
-// =========================================
-
-// =========================================
-// 小さな再利用可能な関数群
-// =========================================
-
 // GetEmployeeBasicInfo は従業員の基本情報のみを取得します
 func (a *App) GetEmployeeBasicInfo(ctx context.Context, employeeID int32) (db.GetEmployeeBasicInfoRow, error) {
 	basicInfo, err := a.db.GetEmployeeBasicInfo(ctx, employeeID)
@@ -41,13 +16,36 @@ func (a *App) GetEmployeeBasicInfo(ctx context.Context, employeeID int32) (db.Ge
 	return basicInfo, nil
 }
 
-// GetEmployeeEmergencyContacts は従業員の緊急連絡先を取得します
-func (a *App) GetEmployeeEmergencyContacts(ctx context.Context, employeeID int32) ([]db.EmergencyContact, error) {
-	emergencyContacts, err := a.db.GetEmployeeEmergencyContacts(ctx, employeeID)
+// GetMasterDataList はマスタデータを取得します
+func (a *App) GetMasterDataList(ctx context.Context) (
+	nationalities []db.MNationality,
+	jobTypes []db.MJobType,
+	employmentTypes []db.MEmploymentType,
+	departments []db.MDepartment,
+	positions []db.MPosition,
+	err error,
+) {
+	nationalities, err = a.db.GetAllMNationalities(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get emergency contacts: %w", err)
+		return nil, nil, nil, nil, nil, fmt.Errorf("failed to get nationalities: %w", err)
 	}
-	return emergencyContacts, nil
+	jobTypes, err = a.db.GetAllMJobTypes(ctx)
+	if err != nil {
+		return nil, nil, nil, nil, nil, fmt.Errorf("failed to get job types: %w", err)
+	}
+	employmentTypes, err = a.db.GetAllMEmploymentTypes(ctx)
+	if err != nil {
+		return nil, nil, nil, nil, nil, fmt.Errorf("failed to get employment types: %w", err)
+	}
+	departments, err = a.db.GetAllMDepartments(ctx)
+	if err != nil {
+		return nil, nil, nil, nil, nil, fmt.Errorf("failed to get departments: %w", err)
+	}
+	positions, err = a.db.GetAllMPositions(ctx)
+	if err != nil {
+		return nil, nil, nil, nil, nil, fmt.Errorf("failed to get positions: %w", err)
+	}
+	return nationalities, jobTypes, employmentTypes, departments, positions, nil
 }
 
 // GetEmployeeRecords は従業員の各種記録（教育訓練、健康診断、資格、保険）を取得します
@@ -134,8 +132,8 @@ func (a *App) GetEmployeeDetailsData(ctx context.Context, employeeID int32) (*pa
 		return nil, err
 	}
 
-	// 緊急連絡先を取得
-	emergencyContacts, err := a.GetEmployeeEmergencyContacts(ctx, employeeID)
+	// マスタデータを取得
+	nationalities, jobTypes, employmentTypes, departments, positions, err := a.GetMasterDataList(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +159,6 @@ func (a *App) GetEmployeeDetailsData(ctx context.Context, employeeID int32) (*pa
 	// すべてのデータを構造体にまとめて返す
 	return &pages.EmployeesDetailsData{
 		BasicInfo:            basicInfo,
-		EmergencyContacts:    emergencyContacts,
 		TrainingRecords:      trainingRecords,
 		HealthCheckupRecords: healthCheckupRecords,
 		QualificationRecords: qualificationRecords,
@@ -170,5 +167,10 @@ func (a *App) GetEmployeeDetailsData(ctx context.Context, employeeID int32) (*pa
 		CareerRecords:        careerRecords,
 		AccidentRecords:      accidentRecords,
 		ViolationRecords:     violationRecords,
+		Nationalities:        nationalities,
+		JobTypes:             jobTypes,
+		EmploymentTypes:      employmentTypes,
+		Departments:          departments,
+		Positions:            positions,
 	}, nil
 }

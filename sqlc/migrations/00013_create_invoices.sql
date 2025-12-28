@@ -42,12 +42,12 @@ CREATE TABLE IF NOT EXISTS invoices (
     deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
 );
 
-CREATE INDEX idx_invoices_number ON invoices(invoice_number);
-CREATE INDEX idx_invoices_customer ON invoices(customer_id);
-CREATE INDEX idx_invoices_period ON invoices(billing_period_from, billing_period_to);
-CREATE INDEX idx_invoices_closing_date ON invoices(closing_date);
-CREATE INDEX idx_invoices_status ON invoices(payment_status);
-CREATE INDEX idx_invoices_invoice_date ON invoices(invoice_date);
+CREATE INDEX IF NOT EXISTS idx_invoices_number ON invoices(invoice_number);
+CREATE INDEX IF NOT EXISTS idx_invoices_customer ON invoices(customer_id);
+CREATE INDEX IF NOT EXISTS idx_invoices_period ON invoices(billing_period_from, billing_period_to);
+CREATE INDEX IF NOT EXISTS idx_invoices_closing_date ON invoices(closing_date);
+CREATE INDEX IF NOT EXISTS idx_invoices_status ON invoices(payment_status);
+CREATE INDEX IF NOT EXISTS idx_invoices_invoice_date ON invoices(invoice_date);
 
 -- 請求書とオーダーの紐付けテーブル
 CREATE TABLE IF NOT EXISTS invoice_orders (
@@ -60,8 +60,8 @@ CREATE TABLE IF NOT EXISTS invoice_orders (
     PRIMARY KEY (invoice_id, order_id)
 );
 
-CREATE INDEX idx_invoice_orders_invoice ON invoice_orders(invoice_id);
-CREATE INDEX idx_invoice_orders_order ON invoice_orders(order_id);
+CREATE INDEX IF NOT EXISTS idx_invoice_orders_invoice ON invoice_orders(invoice_id);
+CREATE INDEX IF NOT EXISTS idx_invoice_orders_order ON invoice_orders(order_id);
 
 -- サンプルデータ
 

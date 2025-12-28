@@ -110,8 +110,19 @@ type Querier interface {
 	DeleteSession(ctx context.Context, sessionToken string) error
 	// 車両を論理削除
 	DeleteVehicle(ctx context.Context, id int32) error
+	EmployeeBasicInfoUpdate(ctx context.Context, arg EmployeeBasicInfoUpdateParams) (EmployeeBasicInfoUpdateRow, error)
 	// 従業員のアクティブセッション一覧
 	GetActiveSessionsByEmployee(ctx context.Context, employeeID int32) ([]Session, error)
+	// 部署マスタ
+	GetAllMDepartments(ctx context.Context) ([]MDepartment, error)
+	// 雇用形態マスタ
+	GetAllMEmploymentTypes(ctx context.Context) ([]MEmploymentType, error)
+	// 職種マスタ
+	GetAllMJobTypes(ctx context.Context) ([]MJobType, error)
+	// 国籍マスタ
+	GetAllMNationalities(ctx context.Context) ([]MNationality, error)
+	// 役職マスタ
+	GetAllMPositions(ctx context.Context) ([]MPosition, error)
 	// ==============================
 	// 会社情報・事業所管理クエリ
 	// ==============================
@@ -146,8 +157,6 @@ type Querier interface {
 	GetEmployeeCareerRecords(ctx context.Context, employeeID int32) ([]CareerRecord, error)
 	// 学歴
 	GetEmployeeEducationRecords(ctx context.Context, employeeID int32) ([]EducationRecord, error)
-	// 緊急連絡先
-	GetEmployeeEmergencyContacts(ctx context.Context, employeeID int32) ([]EmergencyContact, error)
 	// ==============================
 	// 認証・セッション管理クエリ
 	// ==============================

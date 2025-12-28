@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS service_items (
     deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
 );
 
-CREATE INDEX idx_service_items_type ON service_items(service_type);
+CREATE INDEX IF NOT EXISTS idx_service_items_type ON service_items(service_type);
 
 -- サンプルデータ（定期便・常用便のみ）
 INSERT INTO service_items (service_type, item_name) VALUES

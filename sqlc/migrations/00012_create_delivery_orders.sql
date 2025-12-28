@@ -72,18 +72,18 @@ CREATE TABLE IF NOT EXISTS delivery_orders (
     deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
 );
 
-CREATE INDEX idx_delivery_orders_number ON delivery_orders(order_number);
-CREATE INDEX idx_delivery_orders_customer ON delivery_orders(customer_id);
-CREATE INDEX idx_delivery_orders_service_type ON delivery_orders(service_type);
-CREATE INDEX idx_delivery_orders_operation_date ON delivery_orders(operation_date);
-CREATE INDEX idx_delivery_orders_driver ON delivery_orders(driver_id);
-CREATE INDEX idx_delivery_orders_vehicle ON delivery_orders(vehicle_id);
-CREATE INDEX idx_delivery_orders_status ON delivery_orders(order_status);
-CREATE INDEX idx_delivery_orders_billing_confirmed ON delivery_orders(billing_confirmed);
-CREATE INDEX idx_delivery_orders_revenue_date ON delivery_orders(revenue_date);
-CREATE INDEX idx_delivery_orders_revenue_month ON delivery_orders(revenue_month);
-CREATE INDEX idx_delivery_orders_revenue_locked ON delivery_orders(revenue_locked);
-CREATE INDEX idx_delivery_orders_invoice_issued ON delivery_orders(invoice_issued);
+CREATE INDEX IF NOT EXISTS idx_delivery_orders_number ON delivery_orders(order_number);
+CREATE INDEX IF NOT EXISTS idx_delivery_orders_customer ON delivery_orders(customer_id);
+CREATE INDEX IF NOT EXISTS idx_delivery_orders_service_type ON delivery_orders(service_type);
+CREATE INDEX IF NOT EXISTS idx_delivery_orders_operation_date ON delivery_orders(operation_date);
+CREATE INDEX IF NOT EXISTS idx_delivery_orders_driver ON delivery_orders(driver_id);
+CREATE INDEX IF NOT EXISTS idx_delivery_orders_vehicle ON delivery_orders(vehicle_id);
+CREATE INDEX IF NOT EXISTS idx_delivery_orders_status ON delivery_orders(order_status);
+CREATE INDEX IF NOT EXISTS idx_delivery_orders_billing_confirmed ON delivery_orders(billing_confirmed);
+CREATE INDEX IF NOT EXISTS idx_delivery_orders_revenue_date ON delivery_orders(revenue_date);
+CREATE INDEX IF NOT EXISTS idx_delivery_orders_revenue_month ON delivery_orders(revenue_month);
+CREATE INDEX IF NOT EXISTS idx_delivery_orders_revenue_locked ON delivery_orders(revenue_locked);
+CREATE INDEX IF NOT EXISTS idx_delivery_orders_invoice_issued ON delivery_orders(invoice_issued);
 
 -- 配送明細テーブル（ルート・請求明細）
 CREATE TABLE IF NOT EXISTS delivery_details (
@@ -123,12 +123,12 @@ CREATE TABLE IF NOT EXISTS delivery_details (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_delivery_details_order ON delivery_details(order_id);
-CREATE INDEX idx_delivery_details_driver ON delivery_details(driver_id);
-CREATE INDEX idx_delivery_details_vehicle ON delivery_details(vehicle_id);
-CREATE INDEX idx_delivery_details_trailer ON delivery_details(trailer_id);
-CREATE INDEX idx_delivery_details_service_item ON delivery_details(service_item_id);
-CREATE UNIQUE INDEX idx_delivery_details_line ON delivery_details(order_id, line_number);
+CREATE INDEX IF NOT EXISTS idx_delivery_details_order ON delivery_details(order_id);
+CREATE INDEX IF NOT EXISTS idx_delivery_details_driver ON delivery_details(driver_id);
+CREATE INDEX IF NOT EXISTS idx_delivery_details_vehicle ON delivery_details(vehicle_id);
+CREATE INDEX IF NOT EXISTS idx_delivery_details_trailer ON delivery_details(trailer_id);
+CREATE INDEX IF NOT EXISTS idx_delivery_details_service_item ON delivery_details(service_item_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_delivery_details_line ON delivery_details(order_id, line_number);
 
 -- 追加料金テーブル（経理担当が入力）
 CREATE TABLE IF NOT EXISTS delivery_charges (
@@ -152,9 +152,9 @@ CREATE TABLE IF NOT EXISTS delivery_charges (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_delivery_charges_order ON delivery_charges(order_id);
-CREATE INDEX idx_delivery_charges_detail ON delivery_charges(detail_id);
-CREATE INDEX idx_delivery_charges_type ON delivery_charges(charge_type);
+CREATE INDEX IF NOT EXISTS idx_delivery_charges_order ON delivery_charges(order_id);
+CREATE INDEX IF NOT EXISTS idx_delivery_charges_detail ON delivery_charges(detail_id);
+CREATE INDEX IF NOT EXISTS idx_delivery_charges_type ON delivery_charges(charge_type);
 
 -- 配車履歴テーブル（車両故障・運転手変更などの履歴管理）
 CREATE TABLE IF NOT EXISTS delivery_assignments (
@@ -187,12 +187,12 @@ CREATE TABLE IF NOT EXISTS delivery_assignments (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_delivery_assignments_order ON delivery_assignments(order_id);
-CREATE INDEX idx_delivery_assignments_detail ON delivery_assignments(detail_id);
-CREATE INDEX idx_delivery_assignments_driver ON delivery_assignments(driver_id);
-CREATE INDEX idx_delivery_assignments_vehicle ON delivery_assignments(vehicle_id);
-CREATE INDEX idx_delivery_assignments_status ON delivery_assignments(assignment_status);
-CREATE INDEX idx_delivery_assignments_assigned_at ON delivery_assignments(assigned_at);
+CREATE INDEX IF NOT EXISTS idx_delivery_assignments_order ON delivery_assignments(order_id);
+CREATE INDEX IF NOT EXISTS idx_delivery_assignments_detail ON delivery_assignments(detail_id);
+CREATE INDEX IF NOT EXISTS idx_delivery_assignments_driver ON delivery_assignments(driver_id);
+CREATE INDEX IF NOT EXISTS idx_delivery_assignments_vehicle ON delivery_assignments(vehicle_id);
+CREATE INDEX IF NOT EXISTS idx_delivery_assignments_status ON delivery_assignments(assignment_status);
+CREATE INDEX IF NOT EXISTS idx_delivery_assignments_assigned_at ON delivery_assignments(assigned_at);
 
 -- サンプルデータ
 

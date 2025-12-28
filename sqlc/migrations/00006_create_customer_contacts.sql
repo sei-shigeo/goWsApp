@@ -39,10 +39,10 @@ CREATE TABLE IF NOT EXISTS customer_contacts (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_customer_contacts_customer ON customer_contacts(customer_id);
-CREATE INDEX idx_customer_contacts_code ON customer_contacts(contact_code);
-CREATE INDEX idx_customer_contacts_primary ON customer_contacts(is_primary) WHERE is_primary = true;
-CREATE INDEX idx_customer_contacts_active ON customer_contacts(is_active);
+CREATE INDEX IF NOT EXISTS idx_customer_contacts_customer ON customer_contacts(customer_id);
+CREATE INDEX IF NOT EXISTS idx_customer_contacts_code ON customer_contacts(contact_code);
+CREATE INDEX IF NOT EXISTS idx_customer_contacts_primary ON customer_contacts(is_primary) WHERE is_primary = true;
+CREATE INDEX IF NOT EXISTS idx_customer_contacts_active ON customer_contacts(is_active);
 
 INSERT INTO customer_contacts (
     customer_id, contact_code, 

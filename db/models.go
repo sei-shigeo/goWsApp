@@ -221,74 +221,69 @@ type EducationRecord struct {
 	UpdatedAt            pgtype.Timestamptz `json:"updated_at"`
 }
 
-type EmergencyContact struct {
-	ID                  int32              `json:"id"`
-	EmployeeID          int32              `json:"employee_id"`
-	ContactName         *string            `json:"contact_name"`
-	ContactRelationship *string            `json:"contact_relationship"`
-	ContactPhone        *string            `json:"contact_phone"`
-	CreatedAt           pgtype.Timestamptz `json:"created_at"`
-	UpdatedAt           pgtype.Timestamptz `json:"updated_at"`
-}
-
 type Employee struct {
-	ID                         int32              `json:"id"`
-	EmployeeCode               string             `json:"employee_code"`
-	EmployeeImageUrl           *string            `json:"employee_image_url"`
-	EmployeePhotoDate          pgtype.Date        `json:"employee_photo_date"`
-	LastName                   string             `json:"last_name"`
-	FirstName                  string             `json:"first_name"`
-	LastNameKana               *string            `json:"last_name_kana"`
-	FirstNameKana              *string            `json:"first_name_kana"`
-	LegalName                  *string            `json:"legal_name"`
-	Gender                     string             `json:"gender"`
-	BloodType                  string             `json:"blood_type"`
-	Address                    *string            `json:"address"`
-	Phone                      *string            `json:"phone"`
-	Email                      *string            `json:"email"`
-	BirthDate                  pgtype.Date        `json:"birth_date"`
-	HireDate                   pgtype.Date        `json:"hire_date"`
-	AppointmentDate            pgtype.Date        `json:"appointment_date"`
-	OfficeID                   *int32             `json:"office_id"`
-	JobType                    *string            `json:"job_type"`
-	EmploymentType             *string            `json:"employment_type"`
-	Department                 *string            `json:"department"`
-	Position                   *string            `json:"position"`
-	RetirementDate             pgtype.Date        `json:"retirement_date"`
-	RetirementReason           *string            `json:"retirement_reason"`
-	DeathDate                  pgtype.Date        `json:"death_date"`
-	DeathReason                *string            `json:"death_reason"`
-	DriverLicenseNo            *string            `json:"driver_license_no"`
-	DriverLicenseType          *string            `json:"driver_license_type"`
-	DriverLicenseIssueDate     pgtype.Date        `json:"driver_license_issue_date"`
-	DriverLicenseExpiry        pgtype.Date        `json:"driver_license_expiry"`
-	DriverLicenseImageUrlFront *string            `json:"driver_license_image_url_front"`
-	DriverLicenseImageUrlBack  *string            `json:"driver_license_image_url_back"`
-	DrivingDisabledDate        pgtype.Date        `json:"driving_disabled_date"`
-	DrivingDisabledReason      *string            `json:"driving_disabled_reason"`
-	Nationality                string             `json:"nationality"`
-	VisaType                   *string            `json:"visa_type"`
-	VisaExpiry                 pgtype.Date        `json:"visa_expiry"`
-	VisaImageUrlFront          *string            `json:"visa_image_url_front"`
-	VisaImageUrlBack           *string            `json:"visa_image_url_back"`
-	BankCode                   *string            `json:"bank_code"`
-	BankName                   *string            `json:"bank_name"`
-	BankBranchCode             *string            `json:"bank_branch_code"`
-	BankBranchName             *string            `json:"bank_branch_name"`
-	BankAccountType            *string            `json:"bank_account_type"`
-	BankAccountNumber          *string            `json:"bank_account_number"`
-	BankAccountName            *string            `json:"bank_account_name"`
-	BankAccountKana            *string            `json:"bank_account_kana"`
-	RoleID                     *int32             `json:"role_id"`
-	PasswordHash               *string            `json:"password_hash"`
-	PasswordUpdatedAt          pgtype.Timestamptz `json:"password_updated_at"`
-	FailedLoginAttempts        *int32             `json:"failed_login_attempts"`
-	LockedUntil                pgtype.Timestamptz `json:"locked_until"`
-	LastLoginAt                pgtype.Timestamptz `json:"last_login_at"`
-	IsActive                   bool               `json:"is_active"`
-	CreatedAt                  pgtype.Timestamptz `json:"created_at"`
-	UpdatedAt                  pgtype.Timestamptz `json:"updated_at"`
-	DeletedAt                  pgtype.Timestamptz `json:"deleted_at"`
+	ID                           int32              `json:"id"`
+	EmployeeCode                 string             `json:"employee_code"`
+	EmployeeImageUrl             *string            `json:"employee_image_url"`
+	EmployeePhotoDate            pgtype.Date        `json:"employee_photo_date"`
+	LastName                     string             `json:"last_name"`
+	FirstName                    string             `json:"first_name"`
+	LastNameKana                 *string            `json:"last_name_kana"`
+	FirstNameKana                *string            `json:"first_name_kana"`
+	LegalName                    *string            `json:"legal_name"`
+	Gender                       string             `json:"gender"`
+	BloodType                    string             `json:"blood_type"`
+	Address                      *string            `json:"address"`
+	Phone                        *string            `json:"phone"`
+	Email                        *string            `json:"email"`
+	EmergencyContactName         *string            `json:"emergency_contact_name"`
+	EmergencyContactRelationship *string            `json:"emergency_contact_relationship"`
+	EmergencyContactPhone        *string            `json:"emergency_contact_phone"`
+	EmergencyContactEmail        *string            `json:"emergency_contact_email"`
+	EmergencyContactAddress      *string            `json:"emergency_contact_address"`
+	BirthDate                    pgtype.Date        `json:"birth_date"`
+	HireDate                     pgtype.Date        `json:"hire_date"`
+	AppointmentDate              pgtype.Date        `json:"appointment_date"`
+	OfficeID                     *int32             `json:"office_id"`
+	EmploymentTypeID             *int32             `json:"employment_type_id"`
+	JobTypeID                    *int32             `json:"job_type_id"`
+	DepartmentID                 *int32             `json:"department_id"`
+	PositionID                   *int32             `json:"position_id"`
+	RetirementDate               pgtype.Date        `json:"retirement_date"`
+	RetirementReason             *string            `json:"retirement_reason"`
+	DeathDate                    pgtype.Date        `json:"death_date"`
+	DeathReason                  *string            `json:"death_reason"`
+	DriverLicenseNo              *string            `json:"driver_license_no"`
+	DriverLicenseType            *string            `json:"driver_license_type"`
+	DriverLicenseIssueDate       pgtype.Date        `json:"driver_license_issue_date"`
+	DriverLicenseExpiry          pgtype.Date        `json:"driver_license_expiry"`
+	DriverLicenseImageUrlFront   *string            `json:"driver_license_image_url_front"`
+	DriverLicenseImageUrlBack    *string            `json:"driver_license_image_url_back"`
+	DrivingDisabledDate          pgtype.Date        `json:"driving_disabled_date"`
+	DrivingDisabledReason        *string            `json:"driving_disabled_reason"`
+	NationalityID                *int32             `json:"nationality_id"`
+	VisaType                     *string            `json:"visa_type"`
+	VisaExpiry                   pgtype.Date        `json:"visa_expiry"`
+	VisaImageUrlFront            *string            `json:"visa_image_url_front"`
+	VisaImageUrlBack             *string            `json:"visa_image_url_back"`
+	BankCode                     *string            `json:"bank_code"`
+	BankName                     *string            `json:"bank_name"`
+	BankBranchCode               *string            `json:"bank_branch_code"`
+	BankBranchName               *string            `json:"bank_branch_name"`
+	BankAccountType              *string            `json:"bank_account_type"`
+	BankAccountNumber            *string            `json:"bank_account_number"`
+	BankAccountName              *string            `json:"bank_account_name"`
+	BankAccountKana              *string            `json:"bank_account_kana"`
+	RoleID                       *int32             `json:"role_id"`
+	PasswordHash                 *string            `json:"password_hash"`
+	PasswordUpdatedAt            pgtype.Timestamptz `json:"password_updated_at"`
+	FailedLoginAttempts          *int32             `json:"failed_login_attempts"`
+	LockedUntil                  pgtype.Timestamptz `json:"locked_until"`
+	LastLoginAt                  pgtype.Timestamptz `json:"last_login_at"`
+	IsActive                     bool               `json:"is_active"`
+	CreatedAt                    pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt                    pgtype.Timestamptz `json:"updated_at"`
+	DeletedAt                    pgtype.Timestamptz `json:"deleted_at"`
 }
 
 type HealthCheckupRecord struct {
@@ -385,6 +380,14 @@ type MBank struct {
 	UpdatedAt     pgtype.Timestamptz `json:"updated_at"`
 }
 
+type MDepartment struct {
+	ID           int32              `json:"id"`
+	Name         string             `json:"name"`
+	DisplayOrder *int32             `json:"display_order"`
+	IsActive     *bool              `json:"is_active"`
+	CreatedAt    pgtype.Timestamptz `json:"created_at"`
+}
+
 type MEmail struct {
 	ID        int32              `json:"id"`
 	OwnerType string             `json:"owner_type"`
@@ -393,6 +396,30 @@ type MEmail struct {
 	IsPrimary *bool              `json:"is_primary"`
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+type MEmploymentType struct {
+	ID           int32              `json:"id"`
+	Name         string             `json:"name"`
+	DisplayOrder *int32             `json:"display_order"`
+	IsActive     *bool              `json:"is_active"`
+	CreatedAt    pgtype.Timestamptz `json:"created_at"`
+}
+
+type MJobType struct {
+	ID           int32              `json:"id"`
+	Name         string             `json:"name"`
+	DisplayOrder *int32             `json:"display_order"`
+	IsActive     *bool              `json:"is_active"`
+	CreatedAt    pgtype.Timestamptz `json:"created_at"`
+}
+
+type MNationality struct {
+	ID           int32              `json:"id"`
+	Name         string             `json:"name"`
+	DisplayOrder *int32             `json:"display_order"`
+	IsActive     *bool              `json:"is_active"`
+	CreatedAt    pgtype.Timestamptz `json:"created_at"`
 }
 
 type MPhone struct {
@@ -404,6 +431,15 @@ type MPhone struct {
 	IsPrimary   *bool              `json:"is_primary"`
 	CreatedAt   pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
+}
+
+type MPosition struct {
+	ID           int32              `json:"id"`
+	Name         string             `json:"name"`
+	Level        *int32             `json:"level"`
+	DisplayOrder *int32             `json:"display_order"`
+	IsActive     *bool              `json:"is_active"`
+	CreatedAt    pgtype.Timestamptz `json:"created_at"`
 }
 
 type MRole struct {

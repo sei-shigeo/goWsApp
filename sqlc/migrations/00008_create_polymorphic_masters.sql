@@ -24,8 +24,8 @@ CREATE TABLE IF NOT EXISTS m_banks (
     CONSTRAINT unique_bank_per_owner UNIQUE (owner_type, owner_id, bank_code)
 );
 
-CREATE INDEX idx_banks_owner ON m_banks(owner_type, owner_id);
-CREATE INDEX idx_banks_active ON m_banks(is_active);
+CREATE INDEX IF NOT EXISTS idx_banks_owner ON m_banks(owner_type, owner_id);
+CREATE INDEX IF NOT EXISTS idx_banks_active ON m_banks(is_active);
 
 INSERT INTO m_banks (
     owner_type, owner_id, 
@@ -52,8 +52,8 @@ CREATE TABLE IF NOT EXISTS m_addresses (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_addresses_owner ON m_addresses(owner_type, owner_id);
-CREATE UNIQUE INDEX idx_addresses_primary ON m_addresses(owner_type, owner_id) WHERE is_primary = true;
+CREATE INDEX IF NOT EXISTS idx_addresses_owner ON m_addresses(owner_type, owner_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_addresses_primary ON m_addresses(owner_type, owner_id) WHERE is_primary = true;
 
 INSERT INTO m_addresses (owner_type, owner_id, postal_code, prefecture, city, street_address, building_name, is_primary) VALUES 
     ('company', 1, '460-0008', '愛知県', '名古屋市中区', '栄3-4-5', 'サンシャインビル10F', true),
@@ -70,8 +70,8 @@ CREATE TABLE IF NOT EXISTS m_emails (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_emails_owner ON m_emails(owner_type, owner_id);
-CREATE UNIQUE INDEX idx_emails_primary ON m_emails(owner_type, owner_id) WHERE is_primary = true;
+CREATE INDEX IF NOT EXISTS idx_emails_owner ON m_emails(owner_type, owner_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_emails_primary ON m_emails(owner_type, owner_id) WHERE is_primary = true;
 
 INSERT INTO m_emails (owner_type, owner_id, email, is_primary) VALUES 
     -- 会社のメールアドレス
@@ -91,8 +91,8 @@ CREATE TABLE IF NOT EXISTS m_phones (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_phones_owner ON m_phones(owner_type, owner_id);
-CREATE UNIQUE INDEX idx_phones_primary ON m_phones(owner_type, owner_id) WHERE is_primary = true;
+CREATE INDEX IF NOT EXISTS idx_phones_owner ON m_phones(owner_type, owner_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_phones_primary ON m_phones(owner_type, owner_id) WHERE is_primary = true;
 
 INSERT INTO m_phones (owner_type, owner_id, phone_number, phone_type, is_primary) VALUES 
     -- 会社の電話番号

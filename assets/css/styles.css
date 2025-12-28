@@ -482,7 +482,7 @@ body {
     }
   }
 
-  & > .section {
+  & > .section.base {
     padding: var(--spacing-md);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-xs);
@@ -560,6 +560,20 @@ body {
         }
       }
     }
+  }
+  & > .section.employment {
+    padding: var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-xs);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: grid;
+    gap: var(--spacing-sm);
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "A B"
+      "A B"
+      "A B"
+      "A B";
   }
 }
 /* A4サイズ用の印刷スタイル */

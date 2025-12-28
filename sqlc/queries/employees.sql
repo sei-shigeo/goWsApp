@@ -18,15 +18,41 @@ SELECT
 e.*, 
 co.office_name, 
 co.office_type,
-r.name as role_name
+r.name as role_name,
+et.name as employment_type_name,
+jt.name as job_type_name,
+d.name as department_name,
+p.name as position_name,
+n.name as nationality_name
 FROM employees e
 LEFT JOIN company_offices co ON e.office_id = co.id AND co.deleted_at IS NULL
 LEFT JOIN m_roles r ON e.role_id = r.id
+LEFT JOIN m_employment_types et ON e.employment_type_id = et.id
+LEFT JOIN m_job_types jt ON e.job_type_id = jt.id
+LEFT JOIN m_departments d ON e.department_id = d.id
+LEFT JOIN m_positions p ON e.position_id = p.id
+LEFT JOIN m_nationalities n ON e.nationality_id = n.id
 WHERE e.id = $1 AND e.deleted_at IS NULL;
 
--- 緊急連絡先
--- name: GetEmployeeEmergencyContacts :many
-SELECT * FROM emergency_contacts WHERE employee_id = $1;
+-- 国籍マスタ
+-- name: GetAllMNationalities :many
+SELECT * FROM m_nationalities;
+
+-- 職種マスタ
+-- name: GetAllMJobTypes :many
+SELECT * FROM m_job_types;
+
+-- 雇用形態マスタ
+-- name: GetAllMEmploymentTypes :many
+SELECT * FROM m_employment_types;
+
+-- 部署マスタ
+-- name: GetAllMDepartments :many
+SELECT * FROM m_departments;
+
+-- 役職マスタ
+-- name: GetAllMPositions :many
+SELECT * FROM m_positions;
 
 -- 教育訓練
 -- name: GetEmployeeTrainingRecords :many

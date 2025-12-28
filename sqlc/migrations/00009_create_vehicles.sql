@@ -76,14 +76,14 @@ CREATE TABLE IF NOT EXISTS vehicles (
     deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
 );
 
-CREATE INDEX idx_vehicles_code ON vehicles(vehicle_code);
-CREATE INDEX idx_vehicles_registration ON vehicles(registration_number);
-CREATE INDEX idx_vehicles_company ON vehicles(company_id);
-CREATE INDEX idx_vehicles_office ON vehicles(office_id);
-CREATE INDEX idx_vehicles_driver ON vehicles(primary_driver_id);
-CREATE INDEX idx_vehicles_status ON vehicles(vehicle_status);
-CREATE INDEX idx_vehicles_active ON vehicles(is_active);
-CREATE INDEX idx_vehicles_inspection_expiry ON vehicles(vehicle_inspection_expiry);
+CREATE INDEX IF NOT EXISTS idx_vehicles_code ON vehicles(vehicle_code);
+CREATE INDEX IF NOT EXISTS idx_vehicles_registration ON vehicles(registration_number);
+CREATE INDEX IF NOT EXISTS idx_vehicles_company ON vehicles(company_id);
+CREATE INDEX IF NOT EXISTS idx_vehicles_office ON vehicles(office_id);
+CREATE INDEX IF NOT EXISTS idx_vehicles_driver ON vehicles(primary_driver_id);
+CREATE INDEX IF NOT EXISTS idx_vehicles_status ON vehicles(vehicle_status);
+CREATE INDEX IF NOT EXISTS idx_vehicles_active ON vehicles(is_active);
+CREATE INDEX IF NOT EXISTS idx_vehicles_inspection_expiry ON vehicles(vehicle_inspection_expiry);
 
 INSERT INTO vehicles (vehicle_code, vehicle_number, registration_number, vehicle_name, manufacturer, model_name, model_year, vehicle_type, fuel_type, transmission_type, company_id, office_id, ownership_type, vehicle_status) VALUES 
     ('V-001', '1号車', '名古屋100あ1234', 'いすゞエルフ', 'いすゞ', 'エルフ', 2020, '小型トラック', '軽油', 'MT', 1, 1, '自社所有', '稼働中'),
@@ -119,9 +119,9 @@ CREATE TABLE IF NOT EXISTS vehicle_maintenance_records (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_vehicle_maintenance_vehicle ON vehicle_maintenance_records(vehicle_id);
-CREATE INDEX idx_vehicle_maintenance_date ON vehicle_maintenance_records(maintenance_date);
-CREATE INDEX idx_vehicle_maintenance_type ON vehicle_maintenance_records(maintenance_type);
+CREATE INDEX IF NOT EXISTS idx_vehicle_maintenance_vehicle ON vehicle_maintenance_records(vehicle_id);
+CREATE INDEX IF NOT EXISTS idx_vehicle_maintenance_date ON vehicle_maintenance_records(maintenance_date);
+CREATE INDEX IF NOT EXISTS idx_vehicle_maintenance_type ON vehicle_maintenance_records(maintenance_type);
 
 -- 車両給油記録テーブル
 CREATE TABLE IF NOT EXISTS vehicle_fuel_records (
@@ -151,9 +151,9 @@ CREATE TABLE IF NOT EXISTS vehicle_fuel_records (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_vehicle_fuel_vehicle ON vehicle_fuel_records(vehicle_id);
-CREATE INDEX idx_vehicle_fuel_driver ON vehicle_fuel_records(driver_id);
-CREATE INDEX idx_vehicle_fuel_date ON vehicle_fuel_records(fuel_date);
+CREATE INDEX IF NOT EXISTS idx_vehicle_fuel_vehicle ON vehicle_fuel_records(vehicle_id);
+CREATE INDEX IF NOT EXISTS idx_vehicle_fuel_driver ON vehicle_fuel_records(driver_id);
+CREATE INDEX IF NOT EXISTS idx_vehicle_fuel_date ON vehicle_fuel_records(fuel_date);
 
 -- 車両事故記録テーブル
 CREATE TABLE IF NOT EXISTS vehicle_accident_records (
@@ -199,10 +199,10 @@ CREATE TABLE IF NOT EXISTS vehicle_accident_records (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_vehicle_accident_vehicle ON vehicle_accident_records(vehicle_id);
-CREATE INDEX idx_vehicle_accident_driver ON vehicle_accident_records(driver_id);
-CREATE INDEX idx_vehicle_accident_date ON vehicle_accident_records(accident_date);
-CREATE INDEX idx_vehicle_accident_type ON vehicle_accident_records(accident_type);
+CREATE INDEX IF NOT EXISTS idx_vehicle_accident_vehicle ON vehicle_accident_records(vehicle_id);
+CREATE INDEX IF NOT EXISTS idx_vehicle_accident_driver ON vehicle_accident_records(driver_id);
+CREATE INDEX IF NOT EXISTS idx_vehicle_accident_date ON vehicle_accident_records(accident_date);
+CREATE INDEX IF NOT EXISTS idx_vehicle_accident_type ON vehicle_accident_records(accident_type);
 
 -- +goose StatementEnd
 

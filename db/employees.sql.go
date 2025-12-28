@@ -11,6 +11,162 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const getAllMDepartments = `-- name: GetAllMDepartments :many
+SELECT id, name, display_order, is_active, created_at FROM m_departments
+`
+
+// 部署マスタ
+func (q *Queries) GetAllMDepartments(ctx context.Context) ([]MDepartment, error) {
+	rows, err := q.db.Query(ctx, getAllMDepartments)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []MDepartment{}
+	for rows.Next() {
+		var i MDepartment
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.DisplayOrder,
+			&i.IsActive,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllMEmploymentTypes = `-- name: GetAllMEmploymentTypes :many
+SELECT id, name, display_order, is_active, created_at FROM m_employment_types
+`
+
+// 雇用形態マスタ
+func (q *Queries) GetAllMEmploymentTypes(ctx context.Context) ([]MEmploymentType, error) {
+	rows, err := q.db.Query(ctx, getAllMEmploymentTypes)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []MEmploymentType{}
+	for rows.Next() {
+		var i MEmploymentType
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.DisplayOrder,
+			&i.IsActive,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllMJobTypes = `-- name: GetAllMJobTypes :many
+SELECT id, name, display_order, is_active, created_at FROM m_job_types
+`
+
+// 職種マスタ
+func (q *Queries) GetAllMJobTypes(ctx context.Context) ([]MJobType, error) {
+	rows, err := q.db.Query(ctx, getAllMJobTypes)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []MJobType{}
+	for rows.Next() {
+		var i MJobType
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.DisplayOrder,
+			&i.IsActive,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllMNationalities = `-- name: GetAllMNationalities :many
+SELECT id, name, display_order, is_active, created_at FROM m_nationalities
+`
+
+// 国籍マスタ
+func (q *Queries) GetAllMNationalities(ctx context.Context) ([]MNationality, error) {
+	rows, err := q.db.Query(ctx, getAllMNationalities)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []MNationality{}
+	for rows.Next() {
+		var i MNationality
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.DisplayOrder,
+			&i.IsActive,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllMPositions = `-- name: GetAllMPositions :many
+SELECT id, name, level, display_order, is_active, created_at FROM m_positions
+`
+
+// 役職マスタ
+func (q *Queries) GetAllMPositions(ctx context.Context) ([]MPosition, error) {
+	rows, err := q.db.Query(ctx, getAllMPositions)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []MPosition{}
+	for rows.Next() {
+		var i MPosition
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Level,
+			&i.DisplayOrder,
+			&i.IsActive,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getEmployeeAccidentRecords = `-- name: GetEmployeeAccidentRecords :many
 SELECT id, employee_id, accident_date, accident_type, accident_location, notes, created_at, updated_at FROM accident_records WHERE employee_id = $1
 `
@@ -47,77 +203,97 @@ func (q *Queries) GetEmployeeAccidentRecords(ctx context.Context, employeeID int
 
 const getEmployeeBasicInfo = `-- name: GetEmployeeBasicInfo :one
 SELECT 
-e.id, e.employee_code, e.employee_image_url, e.employee_photo_date, e.last_name, e.first_name, e.last_name_kana, e.first_name_kana, e.legal_name, e.gender, e.blood_type, e.address, e.phone, e.email, e.birth_date, e.hire_date, e.appointment_date, e.office_id, e.job_type, e.employment_type, e.department, e.position, e.retirement_date, e.retirement_reason, e.death_date, e.death_reason, e.driver_license_no, e.driver_license_type, e.driver_license_issue_date, e.driver_license_expiry, e.driver_license_image_url_front, e.driver_license_image_url_back, e.driving_disabled_date, e.driving_disabled_reason, e.nationality, e.visa_type, e.visa_expiry, e.visa_image_url_front, e.visa_image_url_back, e.bank_code, e.bank_name, e.bank_branch_code, e.bank_branch_name, e.bank_account_type, e.bank_account_number, e.bank_account_name, e.bank_account_kana, e.role_id, e.password_hash, e.password_updated_at, e.failed_login_attempts, e.locked_until, e.last_login_at, e.is_active, e.created_at, e.updated_at, e.deleted_at, 
+e.id, e.employee_code, e.employee_image_url, e.employee_photo_date, e.last_name, e.first_name, e.last_name_kana, e.first_name_kana, e.legal_name, e.gender, e.blood_type, e.address, e.phone, e.email, e.emergency_contact_name, e.emergency_contact_relationship, e.emergency_contact_phone, e.emergency_contact_email, e.emergency_contact_address, e.birth_date, e.hire_date, e.appointment_date, e.office_id, e.employment_type_id, e.job_type_id, e.department_id, e.position_id, e.retirement_date, e.retirement_reason, e.death_date, e.death_reason, e.driver_license_no, e.driver_license_type, e.driver_license_issue_date, e.driver_license_expiry, e.driver_license_image_url_front, e.driver_license_image_url_back, e.driving_disabled_date, e.driving_disabled_reason, e.nationality_id, e.visa_type, e.visa_expiry, e.visa_image_url_front, e.visa_image_url_back, e.bank_code, e.bank_name, e.bank_branch_code, e.bank_branch_name, e.bank_account_type, e.bank_account_number, e.bank_account_name, e.bank_account_kana, e.role_id, e.password_hash, e.password_updated_at, e.failed_login_attempts, e.locked_until, e.last_login_at, e.is_active, e.created_at, e.updated_at, e.deleted_at, 
 co.office_name, 
 co.office_type,
-r.name as role_name
+r.name as role_name,
+et.name as employment_type_name,
+jt.name as job_type_name,
+d.name as department_name,
+p.name as position_name,
+n.name as nationality_name
 FROM employees e
 LEFT JOIN company_offices co ON e.office_id = co.id AND co.deleted_at IS NULL
 LEFT JOIN m_roles r ON e.role_id = r.id
+LEFT JOIN m_employment_types et ON e.employment_type_id = et.id
+LEFT JOIN m_job_types jt ON e.job_type_id = jt.id
+LEFT JOIN m_departments d ON e.department_id = d.id
+LEFT JOIN m_positions p ON e.position_id = p.id
+LEFT JOIN m_nationalities n ON e.nationality_id = n.id
 WHERE e.id = $1 AND e.deleted_at IS NULL
 `
 
 type GetEmployeeBasicInfoRow struct {
-	ID                         int32              `json:"id"`
-	EmployeeCode               string             `json:"employee_code"`
-	EmployeeImageUrl           *string            `json:"employee_image_url"`
-	EmployeePhotoDate          pgtype.Date        `json:"employee_photo_date"`
-	LastName                   string             `json:"last_name"`
-	FirstName                  string             `json:"first_name"`
-	LastNameKana               *string            `json:"last_name_kana"`
-	FirstNameKana              *string            `json:"first_name_kana"`
-	LegalName                  *string            `json:"legal_name"`
-	Gender                     string             `json:"gender"`
-	BloodType                  string             `json:"blood_type"`
-	Address                    *string            `json:"address"`
-	Phone                      *string            `json:"phone"`
-	Email                      *string            `json:"email"`
-	BirthDate                  pgtype.Date        `json:"birth_date"`
-	HireDate                   pgtype.Date        `json:"hire_date"`
-	AppointmentDate            pgtype.Date        `json:"appointment_date"`
-	OfficeID                   *int32             `json:"office_id"`
-	JobType                    *string            `json:"job_type"`
-	EmploymentType             *string            `json:"employment_type"`
-	Department                 *string            `json:"department"`
-	Position                   *string            `json:"position"`
-	RetirementDate             pgtype.Date        `json:"retirement_date"`
-	RetirementReason           *string            `json:"retirement_reason"`
-	DeathDate                  pgtype.Date        `json:"death_date"`
-	DeathReason                *string            `json:"death_reason"`
-	DriverLicenseNo            *string            `json:"driver_license_no"`
-	DriverLicenseType          *string            `json:"driver_license_type"`
-	DriverLicenseIssueDate     pgtype.Date        `json:"driver_license_issue_date"`
-	DriverLicenseExpiry        pgtype.Date        `json:"driver_license_expiry"`
-	DriverLicenseImageUrlFront *string            `json:"driver_license_image_url_front"`
-	DriverLicenseImageUrlBack  *string            `json:"driver_license_image_url_back"`
-	DrivingDisabledDate        pgtype.Date        `json:"driving_disabled_date"`
-	DrivingDisabledReason      *string            `json:"driving_disabled_reason"`
-	Nationality                string             `json:"nationality"`
-	VisaType                   *string            `json:"visa_type"`
-	VisaExpiry                 pgtype.Date        `json:"visa_expiry"`
-	VisaImageUrlFront          *string            `json:"visa_image_url_front"`
-	VisaImageUrlBack           *string            `json:"visa_image_url_back"`
-	BankCode                   *string            `json:"bank_code"`
-	BankName                   *string            `json:"bank_name"`
-	BankBranchCode             *string            `json:"bank_branch_code"`
-	BankBranchName             *string            `json:"bank_branch_name"`
-	BankAccountType            *string            `json:"bank_account_type"`
-	BankAccountNumber          *string            `json:"bank_account_number"`
-	BankAccountName            *string            `json:"bank_account_name"`
-	BankAccountKana            *string            `json:"bank_account_kana"`
-	RoleID                     *int32             `json:"role_id"`
-	PasswordHash               *string            `json:"password_hash"`
-	PasswordUpdatedAt          pgtype.Timestamptz `json:"password_updated_at"`
-	FailedLoginAttempts        *int32             `json:"failed_login_attempts"`
-	LockedUntil                pgtype.Timestamptz `json:"locked_until"`
-	LastLoginAt                pgtype.Timestamptz `json:"last_login_at"`
-	IsActive                   bool               `json:"is_active"`
-	CreatedAt                  pgtype.Timestamptz `json:"created_at"`
-	UpdatedAt                  pgtype.Timestamptz `json:"updated_at"`
-	DeletedAt                  pgtype.Timestamptz `json:"deleted_at"`
-	OfficeName                 *string            `json:"office_name"`
-	OfficeType                 *string            `json:"office_type"`
-	RoleName                   *string            `json:"role_name"`
+	ID                           int32              `json:"id"`
+	EmployeeCode                 string             `json:"employee_code"`
+	EmployeeImageUrl             *string            `json:"employee_image_url"`
+	EmployeePhotoDate            pgtype.Date        `json:"employee_photo_date"`
+	LastName                     string             `json:"last_name"`
+	FirstName                    string             `json:"first_name"`
+	LastNameKana                 *string            `json:"last_name_kana"`
+	FirstNameKana                *string            `json:"first_name_kana"`
+	LegalName                    *string            `json:"legal_name"`
+	Gender                       string             `json:"gender"`
+	BloodType                    string             `json:"blood_type"`
+	Address                      *string            `json:"address"`
+	Phone                        *string            `json:"phone"`
+	Email                        *string            `json:"email"`
+	EmergencyContactName         *string            `json:"emergency_contact_name"`
+	EmergencyContactRelationship *string            `json:"emergency_contact_relationship"`
+	EmergencyContactPhone        *string            `json:"emergency_contact_phone"`
+	EmergencyContactEmail        *string            `json:"emergency_contact_email"`
+	EmergencyContactAddress      *string            `json:"emergency_contact_address"`
+	BirthDate                    pgtype.Date        `json:"birth_date"`
+	HireDate                     pgtype.Date        `json:"hire_date"`
+	AppointmentDate              pgtype.Date        `json:"appointment_date"`
+	OfficeID                     *int32             `json:"office_id"`
+	EmploymentTypeID             *int32             `json:"employment_type_id"`
+	JobTypeID                    *int32             `json:"job_type_id"`
+	DepartmentID                 *int32             `json:"department_id"`
+	PositionID                   *int32             `json:"position_id"`
+	RetirementDate               pgtype.Date        `json:"retirement_date"`
+	RetirementReason             *string            `json:"retirement_reason"`
+	DeathDate                    pgtype.Date        `json:"death_date"`
+	DeathReason                  *string            `json:"death_reason"`
+	DriverLicenseNo              *string            `json:"driver_license_no"`
+	DriverLicenseType            *string            `json:"driver_license_type"`
+	DriverLicenseIssueDate       pgtype.Date        `json:"driver_license_issue_date"`
+	DriverLicenseExpiry          pgtype.Date        `json:"driver_license_expiry"`
+	DriverLicenseImageUrlFront   *string            `json:"driver_license_image_url_front"`
+	DriverLicenseImageUrlBack    *string            `json:"driver_license_image_url_back"`
+	DrivingDisabledDate          pgtype.Date        `json:"driving_disabled_date"`
+	DrivingDisabledReason        *string            `json:"driving_disabled_reason"`
+	NationalityID                *int32             `json:"nationality_id"`
+	VisaType                     *string            `json:"visa_type"`
+	VisaExpiry                   pgtype.Date        `json:"visa_expiry"`
+	VisaImageUrlFront            *string            `json:"visa_image_url_front"`
+	VisaImageUrlBack             *string            `json:"visa_image_url_back"`
+	BankCode                     *string            `json:"bank_code"`
+	BankName                     *string            `json:"bank_name"`
+	BankBranchCode               *string            `json:"bank_branch_code"`
+	BankBranchName               *string            `json:"bank_branch_name"`
+	BankAccountType              *string            `json:"bank_account_type"`
+	BankAccountNumber            *string            `json:"bank_account_number"`
+	BankAccountName              *string            `json:"bank_account_name"`
+	BankAccountKana              *string            `json:"bank_account_kana"`
+	RoleID                       *int32             `json:"role_id"`
+	PasswordHash                 *string            `json:"password_hash"`
+	PasswordUpdatedAt            pgtype.Timestamptz `json:"password_updated_at"`
+	FailedLoginAttempts          *int32             `json:"failed_login_attempts"`
+	LockedUntil                  pgtype.Timestamptz `json:"locked_until"`
+	LastLoginAt                  pgtype.Timestamptz `json:"last_login_at"`
+	IsActive                     bool               `json:"is_active"`
+	CreatedAt                    pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt                    pgtype.Timestamptz `json:"updated_at"`
+	DeletedAt                    pgtype.Timestamptz `json:"deleted_at"`
+	OfficeName                   *string            `json:"office_name"`
+	OfficeType                   *string            `json:"office_type"`
+	RoleName                     *string            `json:"role_name"`
+	EmploymentTypeName           *string            `json:"employment_type_name"`
+	JobTypeName                  *string            `json:"job_type_name"`
+	DepartmentName               *string            `json:"department_name"`
+	PositionName                 *string            `json:"position_name"`
+	NationalityName              *string            `json:"nationality_name"`
 }
 
 // 基本情報 + 所属事業所 + 制限情報
@@ -139,14 +315,19 @@ func (q *Queries) GetEmployeeBasicInfo(ctx context.Context, id int32) (GetEmploy
 		&i.Address,
 		&i.Phone,
 		&i.Email,
+		&i.EmergencyContactName,
+		&i.EmergencyContactRelationship,
+		&i.EmergencyContactPhone,
+		&i.EmergencyContactEmail,
+		&i.EmergencyContactAddress,
 		&i.BirthDate,
 		&i.HireDate,
 		&i.AppointmentDate,
 		&i.OfficeID,
-		&i.JobType,
-		&i.EmploymentType,
-		&i.Department,
-		&i.Position,
+		&i.EmploymentTypeID,
+		&i.JobTypeID,
+		&i.DepartmentID,
+		&i.PositionID,
 		&i.RetirementDate,
 		&i.RetirementReason,
 		&i.DeathDate,
@@ -159,7 +340,7 @@ func (q *Queries) GetEmployeeBasicInfo(ctx context.Context, id int32) (GetEmploy
 		&i.DriverLicenseImageUrlBack,
 		&i.DrivingDisabledDate,
 		&i.DrivingDisabledReason,
-		&i.Nationality,
+		&i.NationalityID,
 		&i.VisaType,
 		&i.VisaExpiry,
 		&i.VisaImageUrlFront,
@@ -185,6 +366,11 @@ func (q *Queries) GetEmployeeBasicInfo(ctx context.Context, id int32) (GetEmploy
 		&i.OfficeName,
 		&i.OfficeType,
 		&i.RoleName,
+		&i.EmploymentTypeName,
+		&i.JobTypeName,
+		&i.DepartmentName,
+		&i.PositionName,
+		&i.NationalityName,
 	)
 	return i, err
 }
@@ -303,39 +489,6 @@ func (q *Queries) GetEmployeeEducationRecords(ctx context.Context, employeeID in
 			&i.EducationDate,
 			&i.EducationInstitution,
 			&i.Notes,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getEmployeeEmergencyContacts = `-- name: GetEmployeeEmergencyContacts :many
-SELECT id, employee_id, contact_name, contact_relationship, contact_phone, created_at, updated_at FROM emergency_contacts WHERE employee_id = $1
-`
-
-// 緊急連絡先
-func (q *Queries) GetEmployeeEmergencyContacts(ctx context.Context, employeeID int32) ([]EmergencyContact, error) {
-	rows, err := q.db.Query(ctx, getEmployeeEmergencyContacts, employeeID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []EmergencyContact{}
-	for rows.Next() {
-		var i EmergencyContact
-		if err := rows.Scan(
-			&i.ID,
-			&i.EmployeeID,
-			&i.ContactName,
-			&i.ContactRelationship,
-			&i.ContactPhone,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {

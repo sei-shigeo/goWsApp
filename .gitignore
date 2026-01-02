@@ -22,3 +22,6 @@ bin/
 # OS関連
 .DS_Store
 Thumbs.db
+
+# Node.js関連
+node_modules/

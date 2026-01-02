@@ -1,11 +1,16 @@
 package pages
 
 import (
+	"github.com/sei-shigeo/webApp/db"
 	"github.com/sei-shigeo/webApp/views/components"
 	"github.com/sei-shigeo/webApp/views/layouts"
 )
 
-templ EmployeesCreate() {
+type EmployeesCreateFormData struct {
+	Nationalities []db.GetNationalitiesRow
+}
+
+templ EmployeesCreatePage() {
 	@layouts.Base() {
 		@components.ContentHeaderSection(components.ContentHeaderProps{
 			Title:  "従業員作成",
@@ -14,49 +19,111 @@ templ EmployeesCreate() {
 		<div class="actions-container">
 			@components.Button(components.ButtonProps{
 				Icon:    "arrow_back",
-				Label:   "戻る",
+				Label:   "'戻る'",
 				OnClick: "@get('/employees')",
 			})
 		</div>
 		<div class="content">
-			@EmployeesCreateForm()
+			// @EmployeesCreateForm( EmployeesCreateFormData )
 		</div>
 	}
 }
 
-templ EmployeesCreateForm() {
-	<form action="/employees/create" method="post">
-		<div>
-			<label for="employee-code">従業員コード</label>
-			<input type="text" id="employee-code" name="employee-code"/>
+templ filed(legend string) {
+	<fieldset class="border border-gray-300 py-2 px-4 rounded-md">
+		<legend class="text-sm font-medium text-gray-700">{ legend }</legend>
+		{ children... }
+	</fieldset>
+}
+
+templ labelInput(typ, lab, val string) {
+	<label class="flex flex-col gap-2 w-full">
+		<span class="text-xs font-medium text-gray-700">{ lab }</span>
+		<input
+			type={ typ }
+			name={ val }
+			class="border border-gray-300 py-1 px-2 rounded-md placeholder:text-sm outline-none text-sm"
+			placeholder="入力してください"
+			autocomplete="off"
+			data-bind={ "add." + val }
+		/>
+	</label>
+}
+
+templ labelSelect(lab, val string, ops []string, children ...templ.Component) {
+	<label class="flex flex-col gap-2">
+		<span class="text-xs font-medium text-gray-700">{ lab }</span>
+		<select name={ val } data-bind={ "add." + val } class="border border-gray-300 py-1 px-2 rounded-md placeholder:text-sm outline-none text-sm">
+			if ops != nil {
+				for _, op := range ops {
+					<option class="" value={ op }>{ op }</option>
+				}
+			} else {
+				{ children... }
+			}
+		</select>
+	</label>
+}
+
+templ inputImage(val string) {
+	<label class="relative size-full block rounded-t-md">
+		<input
+			type="file"
+			name={ val }
+			accept="image/*"
+			data-bind="files"
+			class="hidden"
+		/>
+		<img
+			data-computed:preview="$files.length > 0 ? `data:${$files[0]?.mime};base64,${$files[0]?.contents}` : ''"
+			data-show="$preview"
+			data-attr:src="$preview"
+			alt="従業員画像"
+			class="size-full object-cover"
+		/>
+		<span data-show="!$preview" class="absolute size-full grid place-items-center text-xs text-gray-500">画像が選択されていません</span>
+	</label>
+}
+
+templ EmployeesCreateForm(nationalities []db.GetNationalitiesRow) {
+	<div>
+		<div class="grid grid-cols-1 xl:grid-cols-2 gap-2">
+			<div class="place-self-center flex flex-col size-50 border border-gray-300 rounded-md bg-gray-100">
+				@inputImage("employee_image")
+				<label data-show="$preview" class="flex bg-white rounded-b-md py-2 px-4 items-center gap-2">
+					<span class="flex-none text-gray-700 text-xs">撮影日:</span>
+					<input type="date" class="w-full flex-1 text-xs outline-none focus:outline-none" data-bind="add.shooting_date"/>
+				</label>
+			</div>
+				@filed("個人情報") {
+					@labelInput("text", "従業員コード", "employee_code")
+					<div class="grid grid-cols-3 gap-2">
+						@labelSelect("性別", "gender", gender)
+						@labelSelect("血液型", "blood_type", bloodType)
+						@labelSelect("国籍", "nationality", nil) {
+							for _, nationality := range nationalities {
+								<option class="" value={ nationality.ID }>{ nationality.Name }</option>
+							}
+						}
+					</div>
+					@labelInput("date", "生年月日", "birth_date")
+				}
+				@filed("名前") {
+					<div class="flex gap-2">
+						@labelInput("text", "姓", "last_name")
+						@labelInput("text", "名", "first_name")
+					</div>
+					<div class="flex gap-2">
+						@labelInput("text", "姓(カナ)", "last_name_kana")
+						@labelInput("text", "名(カナ)", "first_name_kana")
+					</div>
+					@labelInput("text", "正式名", "legal_name")
+				}
+				@filed("連絡先") {
+					@labelInput("text", "電話番号", "phone")
+					@labelInput("text", "メールアドレス", "email")
+					@labelInput("text", "住所", "address")
+				}
 		</div>
-		<div>
-			<label for="last-name">姓</label>
-			<input type="text" id="last-name" name="last-name"/>
-		</div>
-		<div>
-			<label for="first-name">名</label>
-			<input type="text" id="first-name" name="first-name"/>
-		</div>
-		<div>
-			<label for="last-name-kana">姓（カナ）</label>
-			<input type="text" id="last-name-kana" name="last-name-kana"/>
-		</div>
-		<div>
-			<label for="first-name-kana">名（カナ）</label>
-			<input type="text" id="first-name-kana" name="first-name-kana"/>
-		</div>
-		<div>
-			<label for="gender">性別</label>
-			<input type="text" id="gender" name="gender"/>
-		</div>
-		<div>
-			<label for="birth-date">生年月日</label>
-			<input type="date" id="birth-date" name="birth-date"/>
-		</div>
-		<div>
-			<label for="hire-date">雇用日</label>
-			<input type="date" id="hire-date" name="hire-date"/>
-		</div>
-	</form>
+	</div>
 }

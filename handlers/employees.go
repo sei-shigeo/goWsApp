@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/sei-shigeo/webApp/db"
-	"github.com/sei-shigeo/webApp/helpers"
+	"github.com/sei-shigeo/webApp/utils"
 	"github.com/sei-shigeo/webApp/views/pages"
 	"github.com/starfederation/datastar-go/datastar"
 )
@@ -16,6 +16,7 @@ func (a *App) EmployeesRouter() error {
 
 	// EmployeesHandler は従業員一覧ページを表示します
 	a.mux.HandleFunc("GET /employees", func(w http.ResponseWriter, r *http.Request) {
+
 		employees, err := a.db.GetEmployeeCardList(r.Context(), db.GetEmployeeCardListParams{
 			Limit:  10,
 			Offset: 0,
@@ -24,11 +25,21 @@ func (a *App) EmployeesRouter() error {
 			http.Error(w, "Failed to get employee card list", http.StatusInternalServerError)
 			return
 		}
-		pages.Employees(employees).Render(r.Context(), w)
+
+		nationalities, err := a.db.GetNationalities(r.Context())
+		if err != nil {
+			http.Error(w, "Failed to get nationalities", http.StatusInternalServerError)
+			return
+		}
+
+		d := pages.EmployeesPageData{
+			Employees: employees,
+			Nationalities: nationalities,
+		}
+		d.EmployeesPage().Render(r.Context(), w)
 	})
 
 	// EmployeesDetailsHandler は従業員詳細ページを表示します
-	// GetEmployeeAllData()を使用してすべてのデータを取得します
 	a.mux.HandleFunc("GET /employees/details/{id}", func(w http.ResponseWriter, r *http.Request) {
 		id := r.PathValue("id")
 		idInt, err := strconv.Atoi(id)
@@ -38,7 +49,7 @@ func (a *App) EmployeesRouter() error {
 		}
 
 		// すべてのデータを取得（リポジトリ関数を使用）
-		pageData, err := a.GetEmployeeDetailsData(r.Context(), int32(idInt))
+		pageData, err := a.GetEmployeeDetailsData(r.Context(), int64(idInt))
 		if err != nil {
 			http.Error(w, "Failed to get employee all data", http.StatusInternalServerError)
 			return
@@ -46,6 +57,7 @@ func (a *App) EmployeesRouter() error {
 
 		pageData.EmployeesDetails().Render(r.Context(), w)
 	})
+
 
 	a.mux.HandleFunc("PATCH /employees/update/{id}", func(w http.ResponseWriter, r *http.Request) {
 		id := r.PathValue("id")
@@ -62,20 +74,20 @@ func (a *App) EmployeesRouter() error {
 			return
 		}
 
-		photoDate, err := helpers.DateFromStringPtr(sig.EmployeePhotoDate)
+		photoDate, err := utils.DateFromString(utils.StringOrEmpty(sig.EmployeePhotoDate))
 		if err != nil {
 			http.Error(w, "bad employee_photo_date", 400)
 			return
 		}
 
-		visaExpiry, err := helpers.DateFromStringPtr(sig.VisaExpiry)
+		visaExpiry, err := utils.DateFromString(utils.StringOrEmpty(sig.VisaExpiry))
 		if err != nil {
 			http.Error(w, "bad visa_expiry", 400)
 			return
 		}
 
 		params := db.EmployeeBasicInfoUpdateParams{
-			ID:                int32(idInt),
+			ID:                int64(idInt),
 			EmployeeCode:      sig.EmployeeCode,
 			EmployeeImageUrl:  sig.EmployeeImageUrl,
 			EmployeePhotoDate: photoDate,
@@ -99,8 +111,8 @@ func (a *App) EmployeesRouter() error {
 			EmergencyContactAddress:      sig.EmergencyContactAddress,
 
 			NationalityID: sig.NationalityID,
-			VisaType:      sig.VisaType,
-			VisaExpiry:    visaExpiry,
+			VisaType:   sig.VisaType,
+			VisaExpiry: visaExpiry,
 		}
 
 		updateEmployee, err := a.db.EmployeeBasicInfoUpdate(r.Context(), params)
@@ -129,7 +141,17 @@ func (a *App) EmployeesRouter() error {
 
 	// EmployeesCreateHandler は従業員作成ページを表示します
 	a.mux.HandleFunc("GET /employees/create", func(w http.ResponseWriter, r *http.Request) {
-		pages.EmployeesCreate().Render(r.Context(), w)
+		pages.EmployeesCreatePage().Render(r.Context(), w)
+	})
+
+	// EmployeesCreatePostHandler は従業員作成を行います
+	a.mux.HandleFunc("POST /employees/create", func(w http.ResponseWriter, r *http.Request) {
+		sig := &pages.EmployeeBasicInfoSignals{}
+		if err := datastar.ReadSignals(r, sig); err != nil {
+			http.Error(w, fmt.Sprintf("Failed to read signals: %v", err), 500)
+			return
+		}
+
 	})
 
 	return nil

@@ -1,13 +1,13 @@
 version: "2"
 sql:
-  - engine: "postgresql"
+  - engine: "sqlite"
     queries: "sqlc/queries"
     schema: "sqlc/migrations"
     gen:
       go:
         package: "db"
         out: "db"
-        sql_package: "pgx/v5"
+        sql_package: "database/sql"
         emit_json_tags: true # タグをJSONにする
         emit_prepared_queries: true # プリペアドクエリを生成する
         emit_interface: true # インターフェースを生成する

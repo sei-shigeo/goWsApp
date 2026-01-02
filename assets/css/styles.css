@@ -82,26 +82,26 @@
 }
 
 /* リセット */
-* {
+/* * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
+} */
 
-a {
+/* a {
   text-decoration: none;
   color: inherit;
-}
+} */
 
 /* button reset */
-button {
+/* button {
   background: none;
   border: none;
   cursor: pointer;
   text-align: left;
-}
+} */
 
-input {
+/* input {
   border: none;
   outline: none;
   background-color: transparent;
@@ -115,26 +115,26 @@ input {
       font-size: var(--font-size-sm);
     }
   }
-}
+} */
 
-select {
+/* select {
   appearance: none;
   border: none;
-}
+} */
 
-:disabled {
+/* :disabled {
   opacity: 1;
-}
+} */
 
-:where(ul, li, ol) {
+/* :where(ul, li, ol) {
   list-style: none;
-}
+} */
 /* heading */
-:where(h1, h2, h3, h4, h5, h6) {
+/* :where(h1, h2, h3, h4, h5, h6) {
   font-size: var(--font-size-sm);
-}
+} */
 /* text size */
-p,
+/* p,
 span,
 a,
 button,
@@ -163,7 +163,7 @@ sup,
 time,
 var {
   font-size: var(--font-size-sm);
-}
+} */
 
 body {
   font-family: "Roboto", sans-serif;

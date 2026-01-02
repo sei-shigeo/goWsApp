@@ -7,96 +7,51 @@ package db
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
+	"time"
 )
 
-const employeeBasicInfoUpdate = `-- name: EmployeeBasicInfoUpdate :one
-UPDATE employees
-SET
-    employee_code = $2,
-    -- 画像情報
-    employee_image_url = $3,
-    employee_photo_date = $4,
-    -- 基本情報
-    last_name = $5,
-    first_name = $6,
-    last_name_kana = $7,
-    first_name_kana = $8,
-    legal_name = $9,
-    gender = $10,
-    blood_type = $11,
-    address = $12,
-    phone = $13,
-    email = $14,
-    -- 緊急連絡先
-    emergency_contact_name = $15,
-    emergency_contact_relationship = $16,
-    emergency_contact_phone = $17,
-    emergency_contact_email = $18,
-    emergency_contact_address = $19,
-    -- 在留資格
-    nationality_id = $20,
-    visa_type = $21,
-    visa_expiry = $22,
+const employeeBasicInfoCreate = `-- name: EmployeeBasicInfoCreate :exec
+nality_id, visa_type, visa_expiry;
 
-    updated_at = CURRENT_TIMESTAMP
-WHERE id = $1
-RETURNING employee_code, employee_image_url, employee_photo_date, last_name, first_name, last_name_kana, first_name_kana, legal_name, gender, blood_type, address, phone, email, emergency_contact_name, emergency_contact_relationship, emergency_contact_phone, emergency_contact_email, emergency_contact_address, nationality_id, visa_type, visa_expiry
+
+INSERT INTO employees (
+    employee_code, employee_image_url, employee_photo_date, last_name, first_name,
+    last_name_kana, first_name_kana, legal_name, gender, blood_type,
+    address, phone, email, emergency_contact_name, emergency_contact_relationship,
+    emergency_contact_phone, emergency_contact_email, emergency_contact_address, nationality_id, visa_type,
+    visa_expiry
+) VALUES (
+    ?, ?, ?, ?, ?,
+    ?, ?, ?, ?, ?,
+    ?, ?, ?,
 `
 
-type EmployeeBasicInfoUpdateParams struct {
-	ID                           int32       `json:"id"`
-	EmployeeCode                 string      `json:"employee_code"`
-	EmployeeImageUrl             *string     `json:"employee_image_url"`
-	EmployeePhotoDate            pgtype.Date `json:"employee_photo_date"`
-	LastName                     string      `json:"last_name"`
-	FirstName                    string      `json:"first_name"`
-	LastNameKana                 *string     `json:"last_name_kana"`
-	FirstNameKana                *string     `json:"first_name_kana"`
-	LegalName                    *string     `json:"legal_name"`
-	Gender                       string      `json:"gender"`
-	BloodType                    string      `json:"blood_type"`
-	Address                      *string     `json:"address"`
-	Phone                        *string     `json:"phone"`
-	Email                        *string     `json:"email"`
-	EmergencyContactName         *string     `json:"emergency_contact_name"`
-	EmergencyContactRelationship *string     `json:"emergency_contact_relationship"`
-	EmergencyContactPhone        *string     `json:"emergency_contact_phone"`
-	EmergencyContactEmail        *string     `json:"emergency_contact_email"`
-	EmergencyContactAddress      *string     `json:"emergency_contact_address"`
-	NationalityID                *int32      `json:"nationality_id"`
-	VisaType                     *string     `json:"visa_type"`
-	VisaExpiry                   pgtype.Date `json:"visa_expiry"`
+type EmployeeBasicInfoCreateParams struct {
+	EmployeeCode                 string     `json:"employee_code"`
+	EmployeeImageUrl             *string    `json:"employee_image_url"`
+	EmployeePhotoDate            *time.Time `json:"employee_photo_date"`
+	LastName                     string     `json:"last_name"`
+	FirstName                    string     `json:"first_name"`
+	LastNameKana                 *string    `json:"last_name_kana"`
+	FirstNameKana                *string    `json:"first_name_kana"`
+	LegalName                    *string    `json:"legal_name"`
+	Gender                       string     `json:"gender"`
+	BloodType                    string     `json:"blood_type"`
+	Address                      *string    `json:"address"`
+	Phone                        *string    `json:"phone"`
+	Email                        *string    `json:"email"`
+	EmergencyContactName         *string    `json:"emergency_contact_name"`
+	EmergencyContactRelationship *string    `json:"emergency_contact_relationship"`
+	EmergencyContactPhone        *string    `json:"emergency_contact_phone"`
+	EmergencyContactEmail        *string    `json:"emergency_contact_email"`
+	EmergencyContactAddress      *string    `json:"emergency_contact_address"`
+	NationalityID                *int64     `json:"nationality_id"`
+	VisaType                     *string    `json:"visa_type"`
+	VisaExpiry                   *time.Time `json:"visa_expiry"`
 }
 
-type EmployeeBasicInfoUpdateRow struct {
-	EmployeeCode                 string      `json:"employee_code"`
-	EmployeeImageUrl             *string     `json:"employee_image_url"`
-	EmployeePhotoDate            pgtype.Date `json:"employee_photo_date"`
-	LastName                     string      `json:"last_name"`
-	FirstName                    string      `json:"first_name"`
-	LastNameKana                 *string     `json:"last_name_kana"`
-	FirstNameKana                *string     `json:"first_name_kana"`
-	LegalName                    *string     `json:"legal_name"`
-	Gender                       string      `json:"gender"`
-	BloodType                    string      `json:"blood_type"`
-	Address                      *string     `json:"address"`
-	Phone                        *string     `json:"phone"`
-	Email                        *string     `json:"email"`
-	EmergencyContactName         *string     `json:"emergency_contact_name"`
-	EmergencyContactRelationship *string     `json:"emergency_contact_relationship"`
-	EmergencyContactPhone        *string     `json:"emergency_contact_phone"`
-	EmergencyContactEmail        *string     `json:"emergency_contact_email"`
-	EmergencyContactAddress      *string     `json:"emergency_contact_address"`
-	NationalityID                *int32      `json:"nationality_id"`
-	VisaType                     *string     `json:"visa_type"`
-	VisaExpiry                   pgtype.Date `json:"visa_expiry"`
-}
-
-func (q *Queries) EmployeeBasicInfoUpdate(ctx context.Context, arg EmployeeBasicInfoUpdateParams) (EmployeeBasicInfoUpdateRow, error) {
-	row := q.db.QueryRow(ctx, employeeBasicInfoUpdate,
-		arg.ID,
+func (q *Queries) EmployeeBasicInfoCreate(ctx context.Context, arg EmployeeBasicInfoCreateParams) error {
+	_, err := q.exec(ctx, q.employeeBasicInfoCreateStmt, employeeBasicInfoCreate,
 		arg.EmployeeCode,
 		arg.EmployeeImageUrl,
 		arg.EmployeePhotoDate,
@@ -118,6 +73,117 @@ func (q *Queries) EmployeeBasicInfoUpdate(ctx context.Context, arg EmployeeBasic
 		arg.NationalityID,
 		arg.VisaType,
 		arg.VisaExpiry,
+	)
+	return err
+}
+
+const employeeBasicInfoUpdate = `-- name: EmployeeBasicInfoUpdate :one
+UPDATE employees
+SET
+    employee_code = ?,
+    -- 画像情報
+    employee_image_url = ?,
+    employee_photo_date = ?,
+    -- 基本情報
+    last_name = ?,
+    first_name = ?,
+    last_name_kana = ?,
+    first_name_kana = ?,
+    legal_name = ?,
+    gender = ?,
+    blood_type = ?,
+    address = ?,
+    phone = ?,
+    email = ?,
+    -- 緊急連絡先
+    emergency_contact_name = ?,
+    emergency_contact_relationship = ?,
+    emergency_contact_phone = ?,
+    emergency_contact_email = ?,
+    emergency_contact_address = ?,
+    -- 在留資格
+    nationality_id = ?,
+    visa_type = ?,
+    visa_expiry = ?,
+
+    updated_at = CURRENT_TIMESTAMP
+WHERE id = ?
+RETURNING employee_code, employee_image_url, employee_photo_date, last_name, first_name, last_name_kana, first_name_kana, legal_name, gender, blood_type, address, phone, email, emergency_contact_name, emergency_contact_relationship, emergency_contact_phone, emergency_contact_email, emergency_contact_address, nati
+`
+
+type EmployeeBasicInfoUpdateParams struct {
+	EmployeeCode                 string     `json:"employee_code"`
+	EmployeeImageUrl             *string    `json:"employee_image_url"`
+	EmployeePhotoDate            *time.Time `json:"employee_photo_date"`
+	LastName                     string     `json:"last_name"`
+	FirstName                    string     `json:"first_name"`
+	LastNameKana                 *string    `json:"last_name_kana"`
+	FirstNameKana                *string    `json:"first_name_kana"`
+	LegalName                    *string    `json:"legal_name"`
+	Gender                       string     `json:"gender"`
+	BloodType                    string     `json:"blood_type"`
+	Address                      *string    `json:"address"`
+	Phone                        *string    `json:"phone"`
+	Email                        *string    `json:"email"`
+	EmergencyContactName         *string    `json:"emergency_contact_name"`
+	EmergencyContactRelationship *string    `json:"emergency_contact_relationship"`
+	EmergencyContactPhone        *string    `json:"emergency_contact_phone"`
+	EmergencyContactEmail        *string    `json:"emergency_contact_email"`
+	EmergencyContactAddress      *string    `json:"emergency_contact_address"`
+	NationalityID                *int64     `json:"nationality_id"`
+	VisaType                     *string    `json:"visa_type"`
+	VisaExpiry                   *time.Time `json:"visa_expiry"`
+	ID                           int64      `json:"id"`
+}
+
+type EmployeeBasicInfoUpdateRow struct {
+	EmployeeCode                 string     `json:"employee_code"`
+	EmployeeImageUrl             *string    `json:"employee_image_url"`
+	EmployeePhotoDate            *time.Time `json:"employee_photo_date"`
+	LastName                     string     `json:"last_name"`
+	FirstName                    string     `json:"first_name"`
+	LastNameKana                 *string    `json:"last_name_kana"`
+	FirstNameKana                *string    `json:"first_name_kana"`
+	LegalName                    *string    `json:"legal_name"`
+	Gender                       string     `json:"gender"`
+	BloodType                    string     `json:"blood_type"`
+	Address                      *string    `json:"address"`
+	Phone                        *string    `json:"phone"`
+	Email                        *string    `json:"email"`
+	EmergencyContactName         *string    `json:"emergency_contact_name"`
+	EmergencyContactRelationship *string    `json:"emergency_contact_relationship"`
+	EmergencyContactPhone        *string    `json:"emergency_contact_phone"`
+	EmergencyContactEmail        *string    `json:"emergency_contact_email"`
+	EmergencyContactAddress      *string    `json:"emergency_contact_address"`
+	NationalityID                *int64     `json:"nationality_id"`
+	VisaType                     *string    `json:"visa_type"`
+	VisaExpiry                   *time.Time `json:"visa_expiry"`
+}
+
+func (q *Queries) EmployeeBasicInfoUpdate(ctx context.Context, arg EmployeeBasicInfoUpdateParams) (EmployeeBasicInfoUpdateRow, error) {
+	row := q.queryRow(ctx, q.employeeBasicInfoUpdateStmt, employeeBasicInfoUpdate,
+		arg.EmployeeCode,
+		arg.EmployeeImageUrl,
+		arg.EmployeePhotoDate,
+		arg.LastName,
+		arg.FirstName,
+		arg.LastNameKana,
+		arg.FirstNameKana,
+		arg.LegalName,
+		arg.Gender,
+		arg.BloodType,
+		arg.Address,
+		arg.Phone,
+		arg.Email,
+		arg.EmergencyContactName,
+		arg.EmergencyContactRelationship,
+		arg.EmergencyContactPhone,
+		arg.EmergencyContactEmail,
+		arg.EmergencyContactAddress,
+		arg.NationalityID,
+		arg.VisaType,
+		arg.VisaExpiry,
+		arg.ID,
 	)
 	var i EmployeeBasicInfoUpdateRow
 	err := row.Scan(

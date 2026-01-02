@@ -3,52 +3,59 @@ package pages
 import (
 	"fmt"
 	"github.com/sei-shigeo/webApp/db"
-	"github.com/sei-shigeo/webApp/helpers"
+	"github.com/sei-shigeo/webApp/utils"
 )
 
 templ EmployeesCard(employees []db.GetEmployeeCardListRow) {
-	<div class="employee-card-container">
+	<div class="grid grid-cols-[repeat(auto-fill,minmax(350px,1fr))] h-24 gap-4">
 		if len(employees) > 0 {
 			for _, employee := range employees {
 				@EmployeeCard(employee)
 			}
 		} else {
-			<div class="no-employees">
-				<span>No employees found</span>
+			<div class="text-center text-gray-500 text-sm py-4">
+				<span>従業員が見つかりません</span>
 			</div>
 		}
 	</div>
 }
 
+type employeeCardListDetails struct {
+	Icon  string
+	Value string
+}
+
 templ EmployeeCard(employee db.GetEmployeeCardListRow) {
-	<div class="employee-card">
-		<button type="button" class="card-content" data-on:click={ fmt.Sprintf("@get('/employees/details/%d')", employee.ID) }>
+	{{
+		fullName := employee.LastName + " " + employee.FirstName;
+		details := []employeeCardListDetails{
+			{Icon: "icon-[ic--outline-badge]", Value: employee.EmployeeCode},
+			{Icon: "icon-[ic--outline-person]", Value: fullName},
+			{Icon: "icon-[ic--outline-phone]", Value: utils.DisplayString(employee.Phone)},
+			{Icon: "icon-[ic--outline-email]", Value: utils.DisplayString(employee.Email)},
+			{Icon: "icon-[ic--outline-map]", Value: utils.DisplayString(employee.Address)},
+		}
+	}}
+	<div class="grid grid-cols-[1fr_60px] border border-gray-200 rounded-md">
+		<button type="button" class="flex items-center gap-2" data-on:click={ fmt.Sprintf("@get('/employees/details/%d')", employee.ID) }>
 			<img
-				class="card-image"
+				class="object-cover size-24 rounded-l-md"
 				src="https://placehold.jp/150x150.png"
-				alt={ fmt.Sprintf("Employee %d: %s", employee.ID, employee.LastName+" "+employee.FirstName) }
+				alt={ fmt.Sprintf("Employee %d: %s", employee.ID, fullName) }
 			/>
-			<ul class="card-info">
-				<li class="info-item">
-					<span class="material-symbols-outlined">badge</span>
-					<span>{ employee.EmployeeCode }</span>
-				</li>
-				<li class="info-item">
-					<span class="material-symbols-outlined">person</span>
-					<span>{ employee.LastName + " " + employee.FirstName }</span>
-				</li>
-				<li class="info-item">
-					<span class="material-symbols-outlined">phone</span>
-					<span>{ helpers.StringOf(employee.Phone) }</span>
-				</li>
-				<li class="info-item">
-					<span class="material-symbols-outlined">email</span>
-					<span>{ helpers.StringOf(employee.Email) }</span>
-				</li>
+			<ul class="flex flex-col">
+				for _, detail := range details {
+					<li class="flex items-center gap-2">
+						<span class={ "text-gray-500 text-sm ", detail.Icon }></span>
+						<span class="text-xs text-gray-500">{ detail.Value }</span>
+					</li>
+				}
 			</ul>
 		</button>
-		<a href={ fmt.Sprintf("/employees/print/%d", employee.ID) } target="_blank" class="card-print-button">
-			<span class="material-symbols-outlined">print</span>
-		</a>
+		// card-listを切り替えるボタン
+		// TODO: ボタンをクリックしたらcard-listを切り替える
+		<button type="button" class="">
+			<span class="icon-[ic--outline-unfold-more] text-3xl text-gray-400"></span>
+		</button>
 	</div>
 }

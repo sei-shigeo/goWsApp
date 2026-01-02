@@ -3,7 +3,7 @@ package pages
 import (
 	"fmt"
 	"github.com/sei-shigeo/webApp/db"
-	"github.com/sei-shigeo/webApp/helpers"
+	"github.com/sei-shigeo/webApp/utils"
 	"github.com/sei-shigeo/webApp/views/components"
 	"github.com/sei-shigeo/webApp/views/layouts"
 )
@@ -29,35 +29,35 @@ type EmployeesDetailsData struct {
 }
 
 type EmployeeBasicInfoSignals struct {
-	ID int32 `json:"id"`
-  EmployeeCode  string  `json:"employee_code"`
-  EmployeeImageUrl *string `json:"employee_image_url"`
-  EmployeePhotoDate *string `json:"employee_photo_date"` // "2025-12-26" で来る想定
+	ID                int64   `json:"id"`
+	EmployeeCode      string  `json:"employee_code"`
+	EmployeeImageUrl  *string `json:"employee_image_url"`
+	EmployeePhotoDate *string `json:"employee_photo_date"` // "2025-12-26" で来る想定
 
-  LastName   string `json:"last_name"`
-  FirstName  string `json:"first_name"`
-  LastNameKana  *string `json:"last_name_kana"`
-  FirstNameKana *string `json:"first_name_kana"`
-  LegalName  *string `json:"legal_name"`
+	LastName      string  `json:"last_name"`
+	FirstName     string  `json:"first_name"`
+	LastNameKana  *string `json:"last_name_kana"`
+	FirstNameKana *string `json:"first_name_kana"`
+	LegalName     *string `json:"legal_name"`
 
-  Gender    string `json:"gender"`
-  BloodType string `json:"blood_type"`
+	Gender    string `json:"gender"`
+	BloodType string `json:"blood_type"`
 
-  Address *string `json:"address"`
-  Phone   *string `json:"phone"`
-  Email   *string `json:"email"`
+	Address *string `json:"address"`
+	Phone   *string `json:"phone"`
+	Email   *string `json:"email"`
 
-  EmergencyContactRelationship *string `json:"emergency_contact_relationship"`
-  EmergencyContactName         *string `json:"emergency_contact_name"`
-  EmergencyContactPhone        *string `json:"emergency_contact_phone"`
-  EmergencyContactEmail        *string `json:"emergency_contact_email"`
-  EmergencyContactAddress      *string `json:"emergency_contact_address"`
+	EmergencyContactRelationship *string `json:"emergency_contact_relationship"`
+	EmergencyContactName         *string `json:"emergency_contact_name"`
+	EmergencyContactPhone        *string `json:"emergency_contact_phone"`
+	EmergencyContactEmail        *string `json:"emergency_contact_email"`
+	EmergencyContactAddress      *string `json:"emergency_contact_address"`
 
-  NationalityID *int32  `json:"nationality_id"`
-  VisaType      *string `json:"visa_type"`
-  VisaExpiry    *string `json:"visa_expiry"` // "2025-12-26"
+	NationalityID *int64  `json:"nationality_id"`
+	VisaType      *string `json:"visa_type"`
+	VisaExpiry    *string `json:"visa_expiry"` // "2025-12-26"
+	IsActive      bool    `json:"is_active"`
 }
-
 
 // EmployeesDetails は従業員詳細ページのメインテンプレート
 templ (d EmployeesDetailsData) EmployeesDetails() {
@@ -83,11 +83,13 @@ templ (d EmployeesDetailsData) EmployeesDetails() {
 				OnClick: "@get('/employees')",
 			})
 		</div>
-		<div class="content employee-details" data-signals={ templ.JSONString(EmployeeBasicInfoSignals{
+		<div
+			class="content employee-details"
+			data-signals={ templ.JSONString(EmployeeBasicInfoSignals{
 			ID: d.BasicInfo.ID,
 			EmployeeCode: d.BasicInfo.EmployeeCode,
 			EmployeeImageUrl: d.BasicInfo.EmployeeImageUrl,
-			EmployeePhotoDate: helpers.StringPtrOf(helpers.DateOf(d.BasicInfo.EmployeePhotoDate)),
+			EmployeePhotoDate: utils.StringPtrOf(utils.DateOf(d.BasicInfo.EmployeePhotoDate)),
 			LastName: d.BasicInfo.LastName,
 			FirstName: d.BasicInfo.FirstName,
 			LastNameKana: d.BasicInfo.LastNameKana,
@@ -103,10 +105,16 @@ templ (d EmployeesDetailsData) EmployeesDetails() {
 			EmergencyContactPhone: d.BasicInfo.EmergencyContactPhone,
 			EmergencyContactEmail: d.BasicInfo.EmergencyContactEmail,
 			EmergencyContactAddress: d.BasicInfo.EmergencyContactAddress,
-			NationalityID: d.BasicInfo.NationalityID,
+			NationalityID: func() *int64 {
+				if d.BasicInfo.NationalityID == nil {
+					return nil
+				}
+				return d.BasicInfo.NationalityID
+			}(),
 			VisaType: d.BasicInfo.VisaType,
-			VisaExpiry: helpers.StringPtrOf(helpers.DateOf(d.BasicInfo.VisaExpiry)),
-		}) }>
+			VisaExpiry: utils.StringPtrOf(utils.DateOf(d.BasicInfo.VisaExpiry)),
+		}) }
+		>
 			@d.SelectedSection()
 			@d.EmployeeBasicSection()
 		</div>
@@ -150,7 +158,7 @@ templ (d EmployeesDetailsData) EmployeeImage() {
 	<div class="fields image" style="grid-area: A;">
 		<div class="item employee-image" style="grid-area: img;">
 			<img
-				src={ helpers.ImageUrlOf(d.BasicInfo.EmployeeImageUrl) }
+				src={ utils.ImageUrlOrEmpty(d.BasicInfo.EmployeeImageUrl) }
 				alt="従業員画像"
 				height="150"
 				width="150"
@@ -177,7 +185,7 @@ templ (d EmployeesDetailsData) Nationality() {
 			for _, nationality := range d.Nationalities {
 				<option
 					value={ fmt.Sprintf("%d", nationality.ID) }
-					selected?={ *d.BasicInfo.NationalityID == nationality.ID }
+					selected?={ d.BasicInfo.NationalityID != nil && *d.BasicInfo.NationalityID == nationality.ID }
 				>
 					{ nationality.Name }
 				</option>
@@ -203,7 +211,7 @@ templ (d EmployeesDetailsData) VisaInfo() {
 		<label class="label" for="visa-type">在留資格</label>
 		<select name="visa-type" id="visa-type" data-bind:visa_type data-attr:placeholder="$update.visa_type" data-attr:disabled="!$isEditing">
 			for _, visaType := range visaType {
-				<option value={ visaType } selected?={ helpers.StringOf(d.BasicInfo.VisaType) == visaType }>{ visaType }</option>
+				<option value={ visaType } selected?={ utils.StringOrEmpty(d.BasicInfo.VisaType) == visaType }>{ visaType }</option>
 			}
 		</select>
 	</div>
@@ -270,44 +278,41 @@ templ (d EmployeesDetailsData) ContactInfo() {
 	<div class="fields contact" style="grid-area: E;">
 		<div class="item email" style="grid-area: email;">
 			<label class="label" for="email">メールアドレス</label>
-			<input type="text" class="value" id="email" data-bind:email placeholder={ helpers.StringOf(d.BasicInfo.Email) } data-attr:disabled="!$isEditing"/>
+			<input type="text" class="value" id="email" data-bind:email placeholder={ utils.DisplayString(d.BasicInfo.Email) } data-attr:disabled="!$isEditing"/>
 		</div>
 		<div class="item phone" style="grid-area: phone;">
 			<label class="label" for="phone">電話番号</label>
-			<input type="text" class="value" id="phone" data-bind:phone placeholder={ helpers.StringOf(d.BasicInfo.Phone) } data-attr:disabled="!$isEditing"/>
+			<input type="text" class="value" id="phone" data-bind:phone placeholder={ utils.DisplayString(d.BasicInfo.Phone) } data-attr:disabled="!$isEditing"/>
 		</div>
 		<div class="item address" style="grid-area: address;">
 			<label class="label" for="address">住所</label>
-			<input type="text" class="value" id="address" data-bind:address placeholder={ helpers.StringOf(d.BasicInfo.Address) } data-attr:disabled="!$isEditing"/>
+			<input type="text" class="value" id="address" data-bind:address placeholder={ utils.DisplayString(d.BasicInfo.Address) } data-attr:disabled="!$isEditing"/>
 		</div>
 	</div>
 }
 
 // 緊急連絡先関係
 templ (d EmployeesDetailsData) EmergencyContactRelationship() {
-	<div
-		class="fields emergency"
-		style="grid-area: F;"
-	>
+	<div class="fields emergency" style="grid-area: F;">
 		<div class="item">
 			<label class="label" for="emergency-relationship">関係</label>
-			<input type="text" class="value" id="emergency-relationship" data-bind:emergency_contact_relationship placeholder={ helpers.StringOf(d.BasicInfo.EmergencyContactRelationship) } data-attr:disabled="!$isEditing"/>
+			<input type="text" class="value" id="emergency-relationship" data-bind:emergency_contact_relationship placeholder={ utils.DisplayString(d.BasicInfo.EmergencyContactRelationship) } data-attr:disabled="!$isEditing"/>
 		</div>
 		<div class="item">
 			<label class="label" for="emergency-name">名前</label>
-			<input type="text" class="value" id="emergency-name" data-bind:emergency_contact_name placeholder={ helpers.StringOf(d.BasicInfo.EmergencyContactName) } data-attr:disabled="!$isEditing"/>
+			<input type="text" class="value" id="emergency-name" data-bind:emergency_contact_name placeholder={ utils.DisplayString(d.BasicInfo.EmergencyContactName) } data-attr:disabled="!$isEditing"/>
 		</div>
 		<div class="item">
 			<label class="label" for="emergency-phone">電話番号</label>
-			<input type="text" class="value" id="emergency-phone" data-bind:emergency_contact_phone placeholder={ helpers.StringOf(d.BasicInfo.EmergencyContactPhone) } data-attr:disabled="!$isEditing"/>
+			<input type="text" class="value" id="emergency-phone" data-bind:emergency_contact_phone placeholder={ utils.DisplayString(d.BasicInfo.EmergencyContactPhone) } data-attr:disabled="!$isEditing"/>
 		</div>
 		<div class="item">
 			<label class="label" for="emergency-email">メールアドレス</label>
-			<input type="text" class="value" id="emergency-email" data-bind:emergency_contact_email placeholder={ helpers.StringOf(d.BasicInfo.EmergencyContactEmail) } data-attr:disabled="!$isEditing"/>
+			<input type="text" class="value" id="emergency-email" data-bind:emergency_contact_email placeholder={ utils.DisplayString(d.BasicInfo.EmergencyContactEmail) } data-attr:disabled="!$isEditing"/>
 		</div>
 		<div class="item">
 			<label class="label" for="emergency-address">住所</label>
-			<input type="text" class="value" id="emergency-address" data-bind:emergency_contact_address placeholder={ helpers.StringOf(d.BasicInfo.EmergencyContactAddress) } data-attr:disabled="!$isEditing"/>
+			<input type="text" class="value" id="emergency-address" data-bind:emergency_contact_address placeholder={ utils.DisplayString(d.BasicInfo.EmergencyContactAddress) } data-attr:disabled="!$isEditing"/>
 		</div>
 	</div>
 }
@@ -318,24 +323,24 @@ templ (d EmployeesDetailsData) EmployeeLicenseSection() {
 		<div class="fields license-info" style="grid-area: C;">
 			<div class="item driver-license-no" style="grid-area: license-no;">
 				<label class="label" for="driver-license-no">運転免許番号</label>
-				<input type="text" class="value" id="driver-license-no" value={ helpers.StringOf(d.BasicInfo.DriverLicenseNo) } data-attr:disabled="$isEdit"/>
+				<input type="text" class="value" id="driver-license-no" value={ utils.StringOrEmpty(d.BasicInfo.DriverLicenseNo) } data-attr:disabled="$isEdit"/>
 			</div>
 			<div class="item driver-license-type" style="grid-area: license-type;">
 				<label class="label" for="driver-license-type">運転免許種別</label>
-				<input type="text" class="value" id="driver-license-type" value={ helpers.StringOf(d.BasicInfo.DriverLicenseType) } data-attr:disabled="$isEdit"/>
+				<input type="text" class="value" id="driver-license-type" value={ utils.StringOrEmpty(d.BasicInfo.DriverLicenseType) } data-attr:disabled="$isEdit"/>
 			</div>
 			<div class="item driver-license-issue-date" style="grid-area: license-issue;">
 				<label class="label" for="driver-license-issue-date">運転免許発行日</label>
-				<input type="date" class="value" id="driver-license-issue-date" value={ helpers.DateOf(d.BasicInfo.DriverLicenseIssueDate) } data-attr:disabled="$isEdit"/>
+				<input type="date" class="value" id="driver-license-issue-date" value={ utils.DateOf(d.BasicInfo.DriverLicenseIssueDate) } data-attr:disabled="$isEdit"/>
 			</div>
 			<div class="item driver-license-expiry" style="grid-area: license-expiry;">
 				<label class="label" for="driver-license-expiry">運転免許有効期限</label>
-				<input type="date" class="value" id="driver-license-expiry" value={ helpers.DateOf(d.BasicInfo.DriverLicenseExpiry) } data-attr:disabled="$isEdit"/>
+				<input type="date" class="value" id="driver-license-expiry" value={ utils.DateOf(d.BasicInfo.DriverLicenseExpiry) } data-attr:disabled="$isEdit"/>
 			</div>
 			<div class="item driver-license-image-front" style="grid-area: license-img-front;">
 				<label class="label" for="driver-license-image-front">運転免許画像（表）</label>
 				<img
-					src={ helpers.ImageUrlOf(d.BasicInfo.DriverLicenseImageUrlFront) }
+					src={ utils.ImageUrlOrEmpty(d.BasicInfo.DriverLicenseImageUrlFront) }
 					alt="運転免許画像（表）"
 					height="150"
 					width="240"
@@ -345,7 +350,7 @@ templ (d EmployeesDetailsData) EmployeeLicenseSection() {
 			<div class="item driver-license-image-back" style="grid-area: license-img-back;">
 				<label class="label" for="driver-license-image-back">運転免許画像（裏）</label>
 				<img
-					src={ helpers.ImageUrlOf(d.BasicInfo.DriverLicenseImageUrlBack) }
+					src={ utils.ImageUrlOrEmpty(d.BasicInfo.DriverLicenseImageUrlBack) }
 					alt="運転免許画像（裏）"
 					height="150"
 					width="240"
@@ -354,11 +359,11 @@ templ (d EmployeesDetailsData) EmployeeLicenseSection() {
 			</div>
 			<div class="item driving-disabled-date" style="grid-area: disabled-date;">
 				<label class="label" for="driving-disabled-date">運転停止日</label>
-				<input type="date" class="value" id="driving-disabled-date" value={ helpers.DateOf(d.BasicInfo.DrivingDisabledDate) } data-attr:disabled="$isEdit"/>
+				<input type="date" class="value" id="driving-disabled-date" value={ utils.DateOf(d.BasicInfo.DrivingDisabledDate) } data-attr:disabled="$isEdit"/>
 			</div>
 			<div class="item driving-disabled-reason" style="grid-area: disabled-reason;">
 				<label class="label" for="driving-disabled-reason">運転停止理由</label>
-				<textarea class="value" id="driving-disabled-reason" data-attr:disabled="$isEdit">{ helpers.StringOf(d.BasicInfo.DrivingDisabledReason) }</textarea>
+				<textarea class="value" id="driving-disabled-reason" data-attr:disabled="$isEdit">{ utils.StringOrEmpty(d.BasicInfo.DrivingDisabledReason) }</textarea>
 			</div>
 		</div>
 	</section>
@@ -370,24 +375,24 @@ templ (d EmployeesDetailsData) EmployeeBankSection() {
 		<div class="fields bank-info" style="grid-area: D;">
 			<div class="item bank-name" style="grid-area: bank-name;">
 				<label class="label" for="bank-name">銀行名</label>
-				<input type="text" class="value" id="bank-name" value={ helpers.StringOf(d.BasicInfo.BankName) } data-attr:disabled="$isEdit"/>
+				<input type="text" class="value" id="bank-name" value={ utils.StringOrEmpty(d.BasicInfo.BankName) } data-attr:disabled="$isEdit"/>
 			</div>
 			<div class="item bank-code" style="grid-area: bank-code;">
 				<label class="label" for="bank-code">銀行コード</label>
-				<input type="text" class="value" id="bank-code" value={ helpers.StringOf(d.BasicInfo.BankCode) } data-attr:disabled="$isEdit"/>
+				<input type="text" class="value" id="bank-code" value={ utils.StringOrEmpty(d.BasicInfo.BankCode) } data-attr:disabled="$isEdit"/>
 			</div>
 			<div class="item bank-branch-name" style="grid-area: branch-name;">
 				<label class="label" for="bank-branch-name">支店名</label>
-				<input type="text" class="value" id="bank-branch-name" value={ helpers.StringOf(d.BasicInfo.BankBranchName) } data-attr:disabled="$isEdit"/>
+				<input type="text" class="value" id="bank-branch-name" value={ utils.StringOrEmpty(d.BasicInfo.BankBranchName) } data-attr:disabled="$isEdit"/>
 			</div>
 			<div class="item bank-branch-code" style="grid-area: branch-code;">
 				<label class="label" for="bank-branch-code">支店コード</label>
-				<input type="text" class="value" id="bank-branch-code" value={ helpers.StringOf(d.BasicInfo.BankBranchCode) } data-attr:disabled="$isEdit"/>
+				<input type="text" class="value" id="bank-branch-code" value={ utils.StringOrEmpty(d.BasicInfo.BankBranchCode) } data-attr:disabled="$isEdit"/>
 			</div>
 			<div class="item bank-account-type" style="grid-area: account-type;">
 				<label class="label" for="bank-account-type">口座種別</label>
 				<select name="bank-account-type" id="bank-account-type" data-attr:disabled="$isEdit">
-					<option value={ helpers.StringOf(d.BasicInfo.BankAccountType) }>{ helpers.StringOf(d.BasicInfo.BankAccountType) }</option>
+					<option value={ utils.StringOrEmpty(d.BasicInfo.BankAccountType) }>{ utils.StringOrEmpty(d.BasicInfo.BankAccountType) }</option>
 					<option value="普通">普通</option>
 					<option value="当座">当座</option>
 					<option value="貯蓄">貯蓄</option>
@@ -395,15 +400,15 @@ templ (d EmployeesDetailsData) EmployeeBankSection() {
 			</div>
 			<div class="item bank-account-number" style="grid-area: account-number;">
 				<label class="label" for="bank-account-number">口座番号</label>
-				<input type="text" class="value" id="bank-account-number" value={ helpers.StringOf(d.BasicInfo.BankAccountNumber) } data-attr:disabled="$isEdit"/>
+				<input type="text" class="value" id="bank-account-number" value={ utils.StringOrEmpty(d.BasicInfo.BankAccountNumber) } data-attr:disabled="$isEdit"/>
 			</div>
 			<div class="item bank-account-name" style="grid-area: account-name;">
 				<label class="label" for="bank-account-name">口座名義</label>
-				<input type="text" class="value" id="bank-account-name" value={ helpers.StringOf(d.BasicInfo.BankAccountName) } data-attr:disabled="$isEdit"/>
+				<input type="text" class="value" id="bank-account-name" value={ utils.StringOrEmpty(d.BasicInfo.BankAccountName) } data-attr:disabled="$isEdit"/>
 			</div>
 			<div class="item bank-account-kana" style="grid-area: account-kana;">
 				<label class="label" for="bank-account-kana">口座名義（カナ）</label>
-				<input type="text" class="value" id="bank-account-kana" value={ helpers.StringOf(d.BasicInfo.BankAccountKana) } data-attr:disabled="$isEdit"/>
+				<input type="text" class="value" id="bank-account-kana" value={ utils.StringOrEmpty(d.BasicInfo.BankAccountKana) } data-attr:disabled="$isEdit"/>
 			</div>
 		</div>
 	</section>

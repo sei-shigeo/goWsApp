@@ -7,8 +7,9 @@ import (
 	"github.com/sei-shigeo/webApp/db"
 	"github.com/sei-shigeo/webApp/views/pages"
 )
+
 // GetEmployeeBasicInfo は従業員の基本情報のみを取得します
-func (a *App) GetEmployeeBasicInfo(ctx context.Context, employeeID int32) (db.GetEmployeeBasicInfoRow, error) {
+func (a *App) GetEmployeeBasicInfo(ctx context.Context, employeeID int64) (db.GetEmployeeBasicInfoRow, error) {
 	basicInfo, err := a.db.GetEmployeeBasicInfo(ctx, employeeID)
 	if err != nil {
 		return db.GetEmployeeBasicInfoRow{}, fmt.Errorf("failed to get basic info: %w", err)
@@ -49,7 +50,7 @@ func (a *App) GetMasterDataList(ctx context.Context) (
 }
 
 // GetEmployeeRecords は従業員の各種記録（教育訓練、健康診断、資格、保険）を取得します
-func (a *App) GetEmployeeRecords(ctx context.Context, employeeID int32) (
+func (a *App) GetEmployeeRecords(ctx context.Context, employeeID int64) (
 	trainingRecords []db.TrainingRecord,
 	healthCheckupRecords []db.HealthCheckupRecord,
 	qualificationRecords []db.QualificationRecord,
@@ -84,7 +85,7 @@ func (a *App) GetEmployeeRecords(ctx context.Context, employeeID int32) (
 }
 
 // GetEmployeeEducationAndCareerRecords は従業員の学歴記録と職歴記録を取得します
-func (a *App) GetEmployeeEducationAndCareerRecords(ctx context.Context, employeeID int32) (
+func (a *App) GetEmployeeEducationAndCareerRecords(ctx context.Context, employeeID int64) (
 	educationRecords []db.EducationRecord,
 	careerRecords []db.CareerRecord,
 	err error,
@@ -103,7 +104,7 @@ func (a *App) GetEmployeeEducationAndCareerRecords(ctx context.Context, employee
 }
 
 // GetEmployeeAccidentAndViolationRecords は従業員の事故履歴と違反履歴を取得します
-func (a *App) GetEmployeeAccidentAndViolationRecords(ctx context.Context, employeeID int32) (
+func (a *App) GetEmployeeAccidentAndViolationRecords(ctx context.Context, employeeID int64) (
 	accidentRecords []db.AccidentRecord,
 	violationRecords []db.ViolationRecord,
 	err error,
@@ -125,7 +126,7 @@ func (a *App) GetEmployeeAccidentAndViolationRecords(ctx context.Context, employ
 
 // GetEmployeeAllData は指定されたIDの従業員のすべての関連データを取得します
 // 内部で小さな関数を組み合わせて使用するため、部分的なデータ取得も可能です
-func (a *App) GetEmployeeDetailsData(ctx context.Context, employeeID int32) (*pages.EmployeesDetailsData, error) {
+func (a *App) GetEmployeeDetailsData(ctx context.Context, employeeID int64) (*pages.EmployeesDetailsData, error) {
 	// 基本情報を取得
 	basicInfo, err := a.GetEmployeeBasicInfo(ctx, employeeID)
 	if err != nil {

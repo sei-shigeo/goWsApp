@@ -6,18 +6,32 @@ SELECT
     last_name, 
     first_name,
     email,
-    phone
+    phone,
+    address
 FROM employees
 WHERE deleted_at IS NULL
 ORDER BY employee_code
-LIMIT $1 OFFSET $2;
+LIMIT ? OFFSET ?;
 
--- 基本情報 + 所属事業所 + 制限情報
 -- name: GetEmployeeBasicInfo :one
 SELECT 
-e.*, 
-co.office_name, 
-co.office_type,
+e.id, e.employee_code, e.employee_image_url, e.employee_photo_date,
+e.last_name, e.first_name, e.last_name_kana, e.first_name_kana, e.legal_name,
+e.gender, e.blood_type, e.address, e.phone, e.email,
+e.emergency_contact_name, e.emergency_contact_relationship, e.emergency_contact_phone,
+e.emergency_contact_email, e.emergency_contact_address,
+e.birth_date, e.hire_date, e.appointment_date,
+e.office_id, e.employment_type_id, e.job_type_id, e.department_id, e.position_id,
+e.retirement_date, e.retirement_reason, e.death_date, e.death_reason,
+e.driver_license_no, e.driver_license_type, e.driver_license_issue_date, e.driver_license_expiry,
+e.driver_license_image_url_front, e.driver_license_image_url_back,
+e.driving_disabled_date, e.driving_disabled_reason,
+e.nationality_id, e.visa_type, e.visa_expiry, e.visa_image_url_front, e.visa_image_url_back,
+e.bank_code, e.bank_name, e.bank_branch_code, e.bank_branch_name,
+e.bank_account_type, e.bank_account_number, e.bank_account_name, e.bank_account_kana,
+e.role_id, e.password_hash, e.password_updated_at, e.failed_login_attempts,
+e.locked_until, e.last_login_at, e.is_active, e.created_at, e.updated_at, e.deleted_at,
+co.office_name, co.office_type,
 r.name as role_name,
 et.name as employment_type_name,
 jt.name as job_type_name,
@@ -32,56 +46,43 @@ LEFT JOIN m_job_types jt ON e.job_type_id = jt.id
 LEFT JOIN m_departments d ON e.department_id = d.id
 LEFT JOIN m_positions p ON e.position_id = p.id
 LEFT JOIN m_nationalities n ON e.nationality_id = n.id
-WHERE e.id = $1 AND e.deleted_at IS NULL;
+WHERE e.id = ? AND e.deleted_at IS NULL;
 
--- 国籍マスタ
 -- name: GetAllMNationalities :many
 SELECT * FROM m_nationalities;
 
--- 職種マスタ
 -- name: GetAllMJobTypes :many
 SELECT * FROM m_job_types;
 
--- 雇用形態マスタ
 -- name: GetAllMEmploymentTypes :many
 SELECT * FROM m_employment_types;
 
--- 部署マスタ
 -- name: GetAllMDepartments :many
 SELECT * FROM m_departments;
 
--- 役職マスタ
 -- name: GetAllMPositions :many
 SELECT * FROM m_positions;
 
--- 教育訓練
 -- name: GetEmployeeTrainingRecords :many
-SELECT * FROM training_records WHERE employee_id = $1;
+SELECT * FROM training_records WHERE employee_id = ?;
 
--- 健康診断
 -- name: GetEmployeeHealthCheckupRecords :many
-SELECT * FROM health_checkup_records WHERE employee_id = $1;
+SELECT * FROM health_checkup_records WHERE employee_id = ?;
 
--- 資格
 -- name: GetEmployeeQualificationRecords :many
-SELECT * FROM qualification_records WHERE employee_id = $1;
+SELECT * FROM qualification_records WHERE employee_id = ?;
 
--- 保険
 -- name: GetEmployeeInsuranceRecords :many
-SELECT * FROM insurance_records WHERE employee_id = $1;
+SELECT * FROM insurance_records WHERE employee_id = ?;
 
--- 学歴
 -- name: GetEmployeeEducationRecords :many
-SELECT * FROM education_records WHERE employee_id = $1;
+SELECT * FROM education_records WHERE employee_id = ?;
 
--- 職歴
 -- name: GetEmployeeCareerRecords :many
-SELECT * FROM career_records WHERE employee_id = $1;
+SELECT * FROM career_records WHERE employee_id = ?;
 
--- 事故履歴
--- name: GetEmployeeAccidentRecords :many 
-SELECT * FROM accident_records WHERE employee_id = $1;
+-- name: GetEmployeeAccidentRecords :many
+SELECT * FROM accident_records WHERE employee_id = ?;
 
--- 違反履歴
 -- name: GetEmployeeViolationRecords :many
-SELECT * FROM violation_records WHERE employee_id = $1;
+SELECT * FROM violation_records WHERE employee_id = ?;

@@ -6,21 +6,27 @@ import (
 	"github.com/sei-shigeo/webApp/views/layouts"
 )
 
-templ Employees(employees []db.GetEmployeeCardListRow) {
+type EmployeesPageData struct {
+	Employees []db.GetEmployeeCardListRow
+	Nationalities []db.GetNationalitiesRow
+}
+
+templ (d EmployeesPageData) EmployeesPage() {
 	@layouts.Base() {
 		@components.ContentHeaderSection(components.ContentHeaderProps{
 			Title:  "従業員一覧",
 			Search: true,
 		})
-		<div class="actions-container">
+		<div class="grid gap-2">
 			@components.Button(components.ButtonProps{
 				Icon:    "add",
 				Label:   "'従業員作成'",
 				OnClick: "@get('/employees/create')",
 			})
+			@EmployeesCreateForm(d.Nationalities)
 		</div>
-		<div class="content">
-			@EmployeesCard(employees)
+		<div class="p-4">
+			@EmployeesCard(d.Employees)
 		</div>
 	}
 }

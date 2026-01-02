@@ -6,27 +6,253 @@ package db
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgconn"
+	"database/sql"
+	"fmt"
 )
 
 type DBTX interface {
-	Exec(context.Context, string, ...interface{}) (pgconn.CommandTag, error)
-	Query(context.Context, string, ...interface{}) (pgx.Rows, error)
-	QueryRow(context.Context, string, ...interface{}) pgx.Row
+	ExecContext(context.Context, string, ...interface{}) (sql.Result, error)
+	PrepareContext(context.Context, string) (*sql.Stmt, error)
+	QueryContext(context.Context, string, ...interface{}) (*sql.Rows, error)
+	QueryRowContext(context.Context, string, ...interface{}) *sql.Row
 }
 
 func New(db DBTX) *Queries {
 	return &Queries{db: db}
 }
 
-type Queries struct {
-	db DBTX
+func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
+	q := Queries{db: db}
+	var err error
+	if q.employeeBasicInfoCreateStmt, err = db.PrepareContext(ctx, employeeBasicInfoCreate); err != nil {
+		return nil, fmt.Errorf("error preparing query EmployeeBasicInfoCreate: %w", err)
+	}
+	if q.employeeBasicInfoUpdateStmt, err = db.PrepareContext(ctx, employeeBasicInfoUpdate); err != nil {
+		return nil, fmt.Errorf("error preparing query EmployeeBasicInfoUpdate: %w", err)
+	}
+	if q.getAllMDepartmentsStmt, err = db.PrepareContext(ctx, getAllMDepartments); err != nil {
+		return nil, fmt.Errorf("error preparing query GetAllMDepartments: %w", err)
+	}
+	if q.getAllMEmploymentTypesStmt, err = db.PrepareContext(ctx, getAllMEmploymentTypes); err != nil {
+		return nil, fmt.Errorf("error preparing query GetAllMEmploymentTypes: %w", err)
+	}
+	if q.getAllMJobTypesStmt, err = db.PrepareContext(ctx, getAllMJobTypes); err != nil {
+		return nil, fmt.Errorf("error preparing query GetAllMJobTypes: %w", err)
+	}
+	if q.getAllMNationalitiesStmt, err = db.PrepareContext(ctx, getAllMNationalities); err != nil {
+		return nil, fmt.Errorf("error preparing query GetAllMNationalities: %w", err)
+	}
+	if q.getAllMPositionsStmt, err = db.PrepareContext(ctx, getAllMPositions); err != nil {
+		return nil, fmt.Errorf("error preparing query GetAllMPositions: %w", err)
+	}
+	if q.getEmployeeAccidentRecordsStmt, err = db.PrepareContext(ctx, getEmployeeAccidentRecords); err != nil {
+		return nil, fmt.Errorf("error preparing query GetEmployeeAccidentRecords: %w", err)
+	}
+	if q.getEmployeeBasicInfoStmt, err = db.PrepareContext(ctx, getEmployeeBasicInfo); err != nil {
+		return nil, fmt.Errorf("error preparing query GetEmployeeBasicInfo: %w", err)
+	}
+	if q.getEmployeeCardListStmt, err = db.PrepareContext(ctx, getEmployeeCardList); err != nil {
+		return nil, fmt.Errorf("error preparing query GetEmployeeCardList: %w", err)
+	}
+	if q.getEmployeeCareerRecordsStmt, err = db.PrepareContext(ctx, getEmployeeCareerRecords); err != nil {
+		return nil, fmt.Errorf("error preparing query GetEmployeeCareerRecords: %w", err)
+	}
+	if q.getEmployeeEducationRecordsStmt, err = db.PrepareContext(ctx, getEmployeeEducationRecords); err != nil {
+		return nil, fmt.Errorf("error preparing query GetEmployeeEducationRecords: %w", err)
+	}
+	if q.getEmployeeHealthCheckupRecordsStmt, err = db.PrepareContext(ctx, getEmployeeHealthCheckupRecords); err != nil {
+		return nil, fmt.Errorf("error preparing query GetEmployeeHealthCheckupRecords: %w", err)
+	}
+	if q.getEmployeeInsuranceRecordsStmt, err = db.PrepareContext(ctx, getEmployeeInsuranceRecords); err != nil {
+		return nil, fmt.Errorf("error preparing query GetEmployeeInsuranceRecords: %w", err)
+	}
+	if q.getEmployeeQualificationRecordsStmt, err = db.PrepareContext(ctx, getEmployeeQualificationRecords); err != nil {
+		return nil, fmt.Errorf("error preparing query GetEmployeeQualificationRecords: %w", err)
+	}
+	if q.getEmployeeTrainingRecordsStmt, err = db.PrepareContext(ctx, getEmployeeTrainingRecords); err != nil {
+		return nil, fmt.Errorf("error preparing query GetEmployeeTrainingRecords: %w", err)
+	}
+	if q.getEmployeeViolationRecordsStmt, err = db.PrepareContext(ctx, getEmployeeViolationRecords); err != nil {
+		return nil, fmt.Errorf("error preparing query GetEmployeeViolationRecords: %w", err)
+	}
+	if q.getNationalitiesStmt, err = db.PrepareContext(ctx, getNationalities); err != nil {
+		return nil, fmt.Errorf("error preparing query GetNationalities: %w", err)
+	}
+	return &q, nil
 }
 
-func (q *Queries) WithTx(tx pgx.Tx) *Queries {
+func (q *Queries) Close() error {
+	var err error
+	if q.employeeBasicInfoCreateStmt != nil {
+		if cerr := q.employeeBasicInfoCreateStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing employeeBasicInfoCreateStmt: %w", cerr)
+		}
+	}
+	if q.employeeBasicInfoUpdateStmt != nil {
+		if cerr := q.employeeBasicInfoUpdateStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing employeeBasicInfoUpdateStmt: %w", cerr)
+		}
+	}
+	if q.getAllMDepartmentsStmt != nil {
+		if cerr := q.getAllMDepartmentsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getAllMDepartmentsStmt: %w", cerr)
+		}
+	}
+	if q.getAllMEmploymentTypesStmt != nil {
+		if cerr := q.getAllMEmploymentTypesStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getAllMEmploymentTypesStmt: %w", cerr)
+		}
+	}
+	if q.getAllMJobTypesStmt != nil {
+		if cerr := q.getAllMJobTypesStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getAllMJobTypesStmt: %w", cerr)
+		}
+	}
+	if q.getAllMNationalitiesStmt != nil {
+		if cerr := q.getAllMNationalitiesStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getAllMNationalitiesStmt: %w", cerr)
+		}
+	}
+	if q.getAllMPositionsStmt != nil {
+		if cerr := q.getAllMPositionsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getAllMPositionsStmt: %w", cerr)
+		}
+	}
+	if q.getEmployeeAccidentRecordsStmt != nil {
+		if cerr := q.getEmployeeAccidentRecordsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getEmployeeAccidentRecordsStmt: %w", cerr)
+		}
+	}
+	if q.getEmployeeBasicInfoStmt != nil {
+		if cerr := q.getEmployeeBasicInfoStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getEmployeeBasicInfoStmt: %w", cerr)
+		}
+	}
+	if q.getEmployeeCardListStmt != nil {
+		if cerr := q.getEmployeeCardListStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getEmployeeCardListStmt: %w", cerr)
+		}
+	}
+	if q.getEmployeeCareerRecordsStmt != nil {
+		if cerr := q.getEmployeeCareerRecordsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getEmployeeCareerRecordsStmt: %w", cerr)
+		}
+	}
+	if q.getEmployeeEducationRecordsStmt != nil {
+		if cerr := q.getEmployeeEducationRecordsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getEmployeeEducationRecordsStmt: %w", cerr)
+		}
+	}
+	if q.getEmployeeHealthCheckupRecordsStmt != nil {
+		if cerr := q.getEmployeeHealthCheckupRecordsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getEmployeeHealthCheckupRecordsStmt: %w", cerr)
+		}
+	}
+	if q.getEmployeeInsuranceRecordsStmt != nil {
+		if cerr := q.getEmployeeInsuranceRecordsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getEmployeeInsuranceRecordsStmt: %w", cerr)
+		}
+	}
+	if q.getEmployeeQualificationRecordsStmt != nil {
+		if cerr := q.getEmployeeQualificationRecordsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getEmployeeQualificationRecordsStmt: %w", cerr)
+		}
+	}
+	if q.getEmployeeTrainingRecordsStmt != nil {
+		if cerr := q.getEmployeeTrainingRecordsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getEmployeeTrainingRecordsStmt: %w", cerr)
+		}
+	}
+	if q.getEmployeeViolationRecordsStmt != nil {
+		if cerr := q.getEmployeeViolationRecordsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getEmployeeViolationRecordsStmt: %w", cerr)
+		}
+	}
+	if q.getNationalitiesStmt != nil {
+		if cerr := q.getNationalitiesStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getNationalitiesStmt: %w", cerr)
+		}
+	}
+	return err
+}
+
+func (q *Queries) exec(ctx context.Context, stmt *sql.Stmt, query string, args ...interface{}) (sql.Result, error) {
+	switch {
+	case stmt != nil && q.tx != nil:
+		return q.tx.StmtContext(ctx, stmt).ExecContext(ctx, args...)
+	case stmt != nil:
+		return stmt.ExecContext(ctx, args...)
+	default:
+		return q.db.ExecContext(ctx, query, args...)
+	}
+}
+
+func (q *Queries) query(ctx context.Context, stmt *sql.Stmt, query string, args ...interface{}) (*sql.Rows, error) {
+	switch {
+	case stmt != nil && q.tx != nil:
+		return q.tx.StmtContext(ctx, stmt).QueryContext(ctx, args...)
+	case stmt != nil:
+		return stmt.QueryContext(ctx, args...)
+	default:
+		return q.db.QueryContext(ctx, query, args...)
+	}
+}
+
+func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, args ...interface{}) *sql.Row {
+	switch {
+	case stmt != nil && q.tx != nil:
+		return q.tx.StmtContext(ctx, stmt).QueryRowContext(ctx, args...)
+	case stmt != nil:
+		return stmt.QueryRowContext(ctx, args...)
+	default:
+		return q.db.QueryRowContext(ctx, query, args...)
+	}
+}
+
+type Queries struct {
+	db                                  DBTX
+	tx                                  *sql.Tx
+	employeeBasicInfoCreateStmt         *sql.Stmt
+	employeeBasicInfoUpdateStmt         *sql.Stmt
+	getAllMDepartmentsStmt              *sql.Stmt
+	getAllMEmploymentTypesStmt          *sql.Stmt
+	getAllMJobTypesStmt                 *sql.Stmt
+	getAllMNationalitiesStmt            *sql.Stmt
+	getAllMPositionsStmt                *sql.Stmt
+	getEmployeeAccidentRecordsStmt      *sql.Stmt
+	getEmployeeBasicInfoStmt            *sql.Stmt
+	getEmployeeCardListStmt             *sql.Stmt
+	getEmployeeCareerRecordsStmt        *sql.Stmt
+	getEmployeeEducationRecordsStmt     *sql.Stmt
+	getEmployeeHealthCheckupRecordsStmt *sql.Stmt
+	getEmployeeInsuranceRecordsStmt     *sql.Stmt
+	getEmployeeQualificationRecordsStmt *sql.Stmt
+	getEmployeeTrainingRecordsStmt      *sql.Stmt
+	getEmployeeViolationRecordsStmt     *sql.Stmt
+	getNationalitiesStmt                *sql.Stmt
+}
+
+func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db: tx,
+		db:                                  tx,
+		tx:                                  tx,
+		employeeBasicInfoCreateStmt:         q.employeeBasicInfoCreateStmt,
+		employeeBasicInfoUpdateStmt:         q.employeeBasicInfoUpdateStmt,
+		getAllMDepartmentsStmt:              q.getAllMDepartmentsStmt,
+		getAllMEmploymentTypesStmt:          q.getAllMEmploymentTypesStmt,
+		getAllMJobTypesStmt:                 q.getAllMJobTypesStmt,
+		getAllMNationalitiesStmt:            q.getAllMNationalitiesStmt,
+		getAllMPositionsStmt:                q.getAllMPositionsStmt,
+		getEmployeeAccidentRecordsStmt:      q.getEmployeeAccidentRecordsStmt,
+		getEmployeeBasicInfoStmt:            q.getEmployeeBasicInfoStmt,
+		getEmployeeCardListStmt:             q.getEmployeeCardListStmt,
+		getEmployeeCareerRecordsStmt:        q.getEmployeeCareerRecordsStmt,
+		getEmployeeEducationRecordsStmt:     q.getEmployeeEducationRecordsStmt,
+		getEmployeeHealthCheckupRecordsStmt: q.getEmployeeHealthCheckupRecordsStmt,
+		getEmployeeInsuranceRecordsStmt:     q.getEmployeeInsuranceRecordsStmt,
+		getEmployeeQualificationRecordsStmt: q.getEmployeeQualificationRecordsStmt,
+		getEmployeeTrainingRecordsStmt:      q.getEmployeeTrainingRecordsStmt,
+		getEmployeeViolationRecordsStmt:     q.getEmployeeViolationRecordsStmt,
+		getNationalitiesStmt:                q.getNationalitiesStmt,
 	}
 }

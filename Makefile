@@ -15,7 +15,7 @@ live/server:
 
 # run tailwindcss to generate the styles.css bundle in watch mode.
 # live/tailwind:
-# 	npx --yes tailwindcss -i ./input.css -o ./assets/styles.css --minify --watch
+# 	npx --yes tailwindcss -i ./input.css -o ./assets/css/styles.css --minify --watch
 
 # run esbuild to generate the index.js bundle in watch mode.
 # live/esbuild:
@@ -37,5 +37,16 @@ live:
 
 
 # goose reset && goose up && sqlc generate
+# up:
+# 	@if [ -f wsapp.db ]; then \
+# 		GOOSE_DRIVER=sqlite3 GOOSE_DBSTRING=./wsapp.db goose -dir sqlc/migrations reset; \
+# 	fi && \
+# 	GOOSE_DRIVER=sqlite3 GOOSE_DBSTRING=./wsapp.db goose -dir sqlc/migrations up && \
+# 	sqlc generate
+
 up:
-	goose reset && goose up && sqlc generate
+	rm -f wsapp.db && goose reset && goose up && sqlc generate
+
+# run tailwindcss to generate the styles.css bundle in watch mode.
+css:
+	npx --yes @tailwindcss/cli -i ./input.css -o ./assets/css/output.css --watch
